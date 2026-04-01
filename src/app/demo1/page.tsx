@@ -17,12 +17,11 @@ export default function Demo1Page() {
       }}
     >
       <h1 style={{ fontSize: "2.5rem", marginBottom: "15px", color: "#0f0" }}>
-        Successo!
+        Success!
       </h1>
 
       <p style={{ fontSize: "1.2rem", marginBottom: "40px", color: "#aaa" }}>
-        Sei atterrato nella pagina Demo 1. <br />
-        Il redirect automatico dal QR Code ha funzionato perfettamente!
+        You landed in Demo1 page. <br />
       </p>
 
       <Link
@@ -38,7 +37,7 @@ export default function Demo1Page() {
           fontWeight: "bold",
         }}
       >
-        ← Torna allo Scanner
+        ← Back to the scanner
       </Link>
     </div>
   );
