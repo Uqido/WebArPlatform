@@ -4,7 +4,7 @@ import styles from "./scanner.module.css";
 import { useQrScanner } from "./useQrScanner";
 
 export default function Page() {
-  const { videoRef, state, qrData, newScan } = useQrScanner();
+  const { videoRef, state, qrData } = useQrScanner();
 
   return (
     <div className={styles.container}>
@@ -29,9 +29,10 @@ export default function Page() {
 
         {qrData && (
           <div className={styles.resultBox}>
-            <h3 style={{ color: "#fff", margin: "0 0 10px 0" }}>
-              QR Decodificato!
-            </h3>
+            <h3 style={{ color: "#0f0" }}>✓ Read correctly!</h3>
+            <p style={{ color: "#aaa", fontSize: "12px" }}>
+              Automatic reset in 2 seconds...
+            </p>
             <p
               style={{
                 color: "#aaa",
@@ -43,7 +44,7 @@ export default function Page() {
             </p>
 
             <div style={{ marginBottom: "20px" }}>
-              <strong style={{ color: "#fff" }}>Parametri trovati:</strong>
+              <strong style={{ color: "#fff" }}>Parameters found:</strong>
               {Object.keys(qrData.parameters).length > 0 ? (
                 <ul
                   style={{
@@ -52,22 +53,18 @@ export default function Page() {
                     paddingLeft: "20px",
                   }}
                 >
-                  {Object.entries(qrData.parameters).map(([chiave, valore]) => (
-                    <li key={chiave}>
-                      <b>{chiave}</b>: {valore}
+                  {Object.entries(qrData.parameters).map(([key, value]) => (
+                    <li key={key}>
+                      <b>{key}</b>: {value}
                     </li>
                   ))}
                 </ul>
               ) : (
                 <p style={{ color: "#aaa", fontSize: "14px" }}>
-                  Nessun parametro presente.
+                  No parameter founded.
                 </p>
               )}
             </div>
-
-            <button onClick={newScan} className={styles.button}>
-              Scansiona un altro
-            </button>
           </div>
         )}
       </div>
