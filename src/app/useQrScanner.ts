@@ -109,21 +109,48 @@ export function useQrScanner() {
     const startCamera = async () => {
       try {
         if (!navigator.mediaDevices?.getUserMedia) {
-          setState("Camera API blocked or not supported.");
+          setState(
+            "Camera API blocked or not supported. Check HTTPS/localhost."
+          );
           return;
         }
+
+        // 1. Check if the device is mobile (smartphone or tablet)
+        // Checks the user agent and if the device has a touch screen (useful for modern iPads)
+        const isMobile =
+          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent
+          ) || navigator.maxTouchPoints > 0;
+
+        // 2. Set the video constraints based on the device type
+        // If it's a mobile device, request the rear camera ("environment")
+        // If it's a desktop (e.g., Mac), just pass "true" to get any available webcam
+        const videoConstraints = isMobile
+          ? { facingMode: { ideal: "environment" } }
+          : true;
+
+        // 3. Request camera access with the targeted constraints
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" } },
+          video: videoConstraints,
         });
 
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
+          videoRef.current.setAttribute("playsinline", "true"); // Crucial for iOS autoplay
           await videoRef.current.play();
+
           setState("Scanning...");
           requestRef.current = requestAnimationFrame(scanFrame);
         }
       } catch (err) {
-        if (err instanceof Error) setState(`Error: ${err.name}`);
+        // If the error is NotFoundError, it means the Mac or PC
+        // physically doesn't have a webcam connected, allowed, or enabled.
+        if (err instanceof DOMException && err.name === "NotFoundError") {
+          setState("Error: No camera found on this device.");
+        } else if (err instanceof Error) {
+          setState(`Camera error: ${err.message}`);
+        }
+        console.error("getUserMedia error:", err);
       }
     };
 
