@@ -4,12 +4,12 @@ import Link from "next/link";
 import { ARConfig } from "@/types/ar";
 import { buildARQueryString } from "@/utils/arHelper";
 
-export default function Demo1Page() {
+export default function DemoTrexPage() {
   const config: ARConfig = {
-    markerType: "pattern",
-    markerUrl: "/marker_pattern/pattern-card.patt",
-    modelUrl: "/models/card_model/scene.gltf",
-    scale: [0.0075, 0.0075, 0.0075],
+    markerType: "preset",
+    markerUrl: "hiro",
+    modelUrl: "/models/trex_model/scene.gltf",
+    scale: [0.05, 0.05, 0.05],
     rotation: [-90, 0, 0],
     position: [0, 0, 0],
   };
@@ -55,7 +55,7 @@ export default function Demo1Page() {
               marginTop: 0,
             }}
           >
-            Demo1 - AR Active!
+            DemoTrex - AR Active!
           </h1>
           <p
             style={{

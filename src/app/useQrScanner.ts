@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import jsQR from "jsqr";
 
 // Define authorized IDs here
-const ALLOWED_IDS = ["demo1"];
+const ALLOWED_IDS = ["demo1", "demoTrex"];
 
 export function useQrScanner() {
   const router = useRouter();
@@ -110,7 +110,7 @@ export function useQrScanner() {
       try {
         if (!navigator.mediaDevices?.getUserMedia) {
           setState(
-            "Camera API blocked or not supported. Check HTTPS/localhost."
+            "Camera API blocked or not supported. Check HTTPS/localhost.",
           );
           return;
         }
@@ -119,7 +119,7 @@ export function useQrScanner() {
         // Checks the user agent and if the device has a touch screen (useful for modern iPads)
         const isMobile =
           /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent
+            navigator.userAgent,
           ) || navigator.maxTouchPoints > 0;
 
         // 2. Set the video constraints based on the device type
