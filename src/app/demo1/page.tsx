@@ -10,7 +10,7 @@ export default function Demo1Page() {
         width: "100vw",
         height: "100dvh",
         overflow: "hidden",
-        backgroundColor: "#000", // Sfondo nero per i primi secondi di caricamento
+        backgroundColor: "#000",
       }}
     >
       {}
@@ -39,7 +39,7 @@ export default function Demo1Page() {
               fontSize: "2.5rem",
               marginBottom: "10px",
               color: "#0f0",
-              textShadow: "2px 2px 5px rgba(0,0,0,0.8)", // Ombra per renderlo leggibile sulla fotocamera
+              textShadow: "2px 2px 5px rgba(0,0,0,0.8)",
               marginTop: 0,
             }}
           >
@@ -68,7 +68,7 @@ export default function Demo1Page() {
             borderRadius: "8px",
             fontSize: "16px",
             fontWeight: "bold",
-            pointerEvents: "auto", // IMPORTANTE: riattiva il click solo sul bottone
+            pointerEvents: "auto",
             boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
           }}
         >
