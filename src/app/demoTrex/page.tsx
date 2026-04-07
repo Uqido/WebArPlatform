@@ -88,7 +88,6 @@ export default function DemoTrexPage() {
         </Link>
       </div>
 
-      {/* --- IFRAME AR.JS  --- */}
       <iframe
         src={iframeSrc}
         style={{
