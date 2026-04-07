@@ -88,7 +88,6 @@ export default function Demo1Page() {
         </Link>
       </div>
 
-      {/* --- IFRAME AR.JS  --- */}
       <iframe
         src={iframeSrc}
         style={{
