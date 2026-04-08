@@ -27,7 +27,7 @@ export default function Home() {
       </div>
 
       <ModelViewer
-        src="/models/TV.glb"
+        src="/models/TV-anim.glb"
         alt="Un modello 3D interattivo del mio oggetto"
       />
     </main>
