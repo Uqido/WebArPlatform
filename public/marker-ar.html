@@ -9,6 +9,7 @@
     <title>AR.js Demo</title>
     <script src="/ar-libs/aframe-master.min.js"></script>
     <script src="/ar-libs/aframe-ar.js"></script>
+    <script src="/ar-libs/aframe-extras.min.js"></script>
     <style>
       body {
         margin: 0;
@@ -27,7 +28,7 @@
     </a-scene>
 
     <script>
-      // 1. Read params from URL
+      //  Read params from URL
       const urlParams = new URLSearchParams(window.location.search);
       const markerType = urlParams.get("markerType");
       const markerUrl = urlParams.get("markerUrl");
@@ -39,7 +40,7 @@
       if (modelUrl && markerType) {
         const scene = document.querySelector("a-scene");
 
-        // 2. Create marker
+        // Create marker
         const marker = document.createElement("a-marker");
         if (markerType === "pattern") {
           marker.setAttribute("type", "pattern");
@@ -48,19 +49,57 @@
           marker.setAttribute("preset", markerUrl); // es: "hiro"
         }
 
-        // 3. Create 3D entity
+        marker.addEventListener("markerFound", () => {
+          window.parent.postMessage(
+            { type: "MARKER_STATE", isFound: true },
+            "*",
+          );
+        });
+
+        marker.addEventListener("markerLost", () => {
+          window.parent.postMessage(
+            { type: "MARKER_STATE", isFound: false },
+            "*",
+          );
+        });
+        //  Create 3D entity
         const modelEntity = document.createElement("a-entity");
+
+        // Animation management
+        modelEntity.setAttribute("id", "ar-model");
+        modelEntity.setAttribute(
+          "animation-mixer",
+          "clip: *; loop: repeat; crossFadeDuration: 0.3",
+        );
+
         modelEntity.setAttribute("gltf-model", modelUrl);
         modelEntity.setAttribute("position", position);
         modelEntity.setAttribute("scale", scale);
         modelEntity.setAttribute("rotation", rotation);
 
-        // 4. Add model to marker and marker to scene.
         marker.appendChild(modelEntity);
         scene.appendChild(marker);
       } else {
         console.warn("Missing AR paramaters in Iframe url.");
       }
+
+      // Listener for messages to change animation
+      window.addEventListener("message", (event) => {
+        if (event.data && event.data.type === "CHANGE_ANIMATION") {
+          const modelEl = document.getElementById("ar-model");
+          const clipName = event.data.clip;
+
+          if (modelEl) {
+            // Set the new animation
+            modelEl.setAttribute(
+              "animation-mixer",
+              `clip: ${clipName}; loop: repeat; crossFadeDuration: 0.3`,
+            );
+          } else {
+            console.warn("Modello AR non ancora caricato o ID non trovato.");
+          }
+        }
+      });
     </script>
   </body>
 </html>
