@@ -77,6 +77,19 @@
         modelEntity.setAttribute("scale", scale);
         modelEntity.setAttribute("rotation", rotation);
 
+        // Pass animation to the parent
+        modelEntity.addEventListener("model-loaded", (e) => {
+          const model = e.detail.model;
+          if (model && model.animations && model.animations.length > 0) {
+            const animNames = model.animations.map((anim) => anim.name);
+
+            window.parent.postMessage(
+              { type: "ANIMATIONS_LOADED", animations: animNames },
+              "*",
+            );
+          }
+        });
+
         marker.appendChild(modelEntity);
         scene.appendChild(marker);
       } else {

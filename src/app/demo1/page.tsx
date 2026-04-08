@@ -8,8 +8,9 @@ import { buildARQueryString } from "@/utils/arHelper";
 export default function Demo1Page() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const animations = ["LeftRight", "UpDown"];
-  const [activeAnim, setActiveAnim] = useState<string>(animations[0]);
+  const [animations, setAnimations] = useState<string[]>([]);
+
+  const [activeAnim, setActiveAnim] = useState<string | null>(null);
 
   // Track if marker is found
   const [isMarkerFound, setIsMarkerFound] = useState<boolean>(false);
@@ -25,11 +26,22 @@ export default function Demo1Page() {
 
   const iframeSrc = `/marker-ar.html?${buildARQueryString(config)}`;
 
-  // Listen for marker event from iframe
+  // Listen for events from iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.data && event.data.type === "MARKER_STATE") {
-        setIsMarkerFound(event.data.isFound);
+      if (event.data) {
+        if (event.data.type === "MARKER_STATE") {
+          setIsMarkerFound(event.data.isFound);
+        } else if (event.data.type === "ANIMATIONS_LOADED") {
+          // Listen for animations loaded
+          const loadedAnimations = event.data.animations;
+          setAnimations(loadedAnimations);
+
+          // Set first animation as defaults
+          if (loadedAnimations.length > 0) {
+            setActiveAnim(loadedAnimations[0]);
+          }
+        }
       }
     };
 
@@ -117,9 +129,16 @@ export default function Demo1Page() {
             gap: "20px",
           }}
         >
-          {/* Show buttons only if marker is found */}
-          {isMarkerFound && (
-            <div style={{ display: "flex", gap: "10px" }}>
+          {/* Show buttons only if marker is found and animations exist */}
+          {isMarkerFound && animations.length > 0 && (
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+                justifyContent: "center",
+              }}
+            >
               {animations.map((animName) => (
                 <button
                   key={animName}
