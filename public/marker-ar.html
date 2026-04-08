@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>AR.js Demo</title>
+    <!--TODO: remove fetch from web-->
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: transparent;
+      }
+    </style>
+  </head>
+  <body>
+    <a-scene
+      embedded
+      arjs="sourceType: webcam; debugUIEnabled: false;"
+      vr-mode-ui="enabled: false"
+    >
+      <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+      // 1. Read params from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const markerType = urlParams.get("markerType");
+      const markerUrl = urlParams.get("markerUrl");
+      const modelUrl = urlParams.get("modelUrl");
+      const scale = urlParams.get("scale") || "1 1 1";
+      const rotation = urlParams.get("rotation") || "0 0 0";
+      const position = urlParams.get("position") || "0 0 0";
+
+      if (modelUrl && markerType) {
+        const scene = document.querySelector("a-scene");
+
+        // 2. Create marker
+        const marker = document.createElement("a-marker");
+        if (markerType === "pattern") {
+          marker.setAttribute("type", "pattern");
+          marker.setAttribute("url", markerUrl);
+        } else if (markerType === "preset") {
+          marker.setAttribute("preset", markerUrl); // es: "hiro"
+        }
+
+        // 3. Create 3D entity
+        const modelEntity = document.createElement("a-entity");
+        modelEntity.setAttribute("gltf-model", modelUrl);
+        modelEntity.setAttribute("position", position);
+        modelEntity.setAttribute("scale", scale);
+        modelEntity.setAttribute("rotation", rotation);
+
+        // 4. Add model to marker and marker to scene.
+        marker.appendChild(modelEntity);
+        scene.appendChild(marker);
+      } else {
+        console.warn("Missing AR paramaters in Iframe url.");
+      }
+    </script>
+  </body>
+</html>
