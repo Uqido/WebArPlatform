@@ -18,7 +18,7 @@ const ModelViewer = ({ src, alt }) => {
         auto-rotate
         ar
         ar-modes="webxr scene-viewer quick-look"
-        ar-scale="auto" // Autoscale the 3d model
+        ar-scale="auto" // Autoscale the 3d model (?)
         shadow-intensity="1"
         style={{ width: "100%", height: "100%" }}
       ></model-viewer>
