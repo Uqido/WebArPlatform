@@ -8,5 +8,6 @@ export function buildARQueryString(config: ARConfig): string {
     scale: config.scale.join(" "),
     rotation: config.rotation.join(" "),
     position: config.position.join(" "),
+    particleEffectName: config.particleEffectName ?? "",
   }).toString();
 }

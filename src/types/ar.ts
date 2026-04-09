@@ -7,4 +7,5 @@ export interface ARConfig {
   scale: Vector3;
   rotation: Vector3;
   position: Vector3;
+  particleEffectName?: string;
 }

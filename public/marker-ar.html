@@ -7,9 +7,22 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no"
     />
     <title>AR.js Demo</title>
+
     <script src="/ar-libs/aframe-master.min.js"></script>
     <script src="/ar-libs/aframe-ar.js"></script>
     <script src="/ar-libs/aframe-extras.min.js"></script>
+
+    <script>
+      const headParams = new URLSearchParams(window.location.search);
+      const effectToLoad = headParams.get("particleEffectName");
+
+      if (effectToLoad) {
+        document.write(
+          `<script src="/particles/${effectToLoad}.js"><\/script>`,
+        );
+      }
+    </script>
+
     <style>
       body {
         margin: 0;
@@ -36,6 +49,7 @@
       const scale = urlParams.get("scale") || "1 1 1";
       const rotation = urlParams.get("rotation") || "0 0 0";
       const position = urlParams.get("position") || "0 0 0";
+      const particleEffectName = urlParams.get("particleEffectName");
 
       if (modelUrl && markerType) {
         const scene = document.querySelector("a-scene");
@@ -49,6 +63,7 @@
           marker.setAttribute("preset", markerUrl); // es: "hiro"
         }
 
+        // Listener Marker
         marker.addEventListener("markerFound", () => {
           window.parent.postMessage(
             { type: "MARKER_STATE", isFound: true },
@@ -77,12 +92,11 @@
         modelEntity.setAttribute("scale", scale);
         modelEntity.setAttribute("rotation", rotation);
 
-        // Pass animation to the parent
+        // Pass animation list to the parent
         modelEntity.addEventListener("model-loaded", (e) => {
           const model = e.detail.model;
           if (model && model.animations && model.animations.length > 0) {
             const animNames = model.animations.map((anim) => anim.name);
-
             window.parent.postMessage(
               { type: "ANIMATIONS_LOADED", animations: animNames },
               "*",
@@ -92,6 +106,25 @@
 
         marker.appendChild(modelEntity);
         scene.appendChild(marker);
+
+        if (particleEffectName) {
+          if (scene.hasLoaded) {
+            addParticles();
+          } else {
+            scene.addEventListener("loaded", addParticles);
+          }
+
+          function addParticles() {
+            const particleEntity = document.createElement("a-entity");
+            particleEntity.setAttribute("id", "particle-system");
+
+            particleEntity.setAttribute(particleEffectName, "");
+
+            particleEntity.setAttribute("position", "0 0 0");
+
+            marker.appendChild(particleEntity);
+          }
+        }
       } else {
         console.warn("Missing AR paramaters in Iframe url.");
       }
