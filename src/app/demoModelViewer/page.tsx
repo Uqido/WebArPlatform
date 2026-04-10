@@ -4,7 +4,7 @@ import ModelViewer from "../../components/ModelViewer";
 export default function Home() {
   return (
     <main style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-      <p>Trascina il mouse per ruotare l`oggetto.</p>
+      <p>Interact with the object to rotate it</p>
 
       <div style={{ marginBottom: "20px", marginTop: "20px" }}>
         <Link
