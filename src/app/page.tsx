@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./scanner.module.css";
-import { useQrScanner } from "./useQrScanner";
+import { useQrScanner } from "../utils/useQrScanner";
 
 export default function Page() {
   const { videoRef, state, qrData } = useQrScanner();
