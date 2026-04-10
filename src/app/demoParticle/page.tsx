@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { ARConfig } from "@/types/ar";
-import { buildARQueryString } from "@/utils/arHelper";
+import { buildARQueryString, useIframeMessage } from "@/utils/arHelper";
 
 export default function DemoParticlePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -28,29 +28,12 @@ export default function DemoParticlePage() {
   const iframeSrc = `/marker-ar.html?${buildARQueryString(config)}`;
 
   // Listen for events from iframe
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data) {
-        if (event.data.type === "MARKER_STATE") {
-          setIsMarkerFound(event.data.isFound);
-        } else if (event.data.type === "ANIMATIONS_LOADED") {
-          // Listen for animations loaded
-          const loadedAnimations = event.data.animations;
-          setAnimations(loadedAnimations);
-
-          // Set first animation as defaults
-          if (loadedAnimations.length > 0) {
-            setActiveAnim(loadedAnimations[0]);
-          }
-        }
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, []);
+  useIframeMessage({
+    setIsMarkerFound,
+    setAnimations,
+    setActiveAnim,
+    iframeRef,
+  });
 
   const changeAnimation = (animationName: string) => {
     if (iframeRef.current && iframeRef.current.contentWindow) {
