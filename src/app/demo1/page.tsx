@@ -20,7 +20,7 @@ export default function Demo1Page() {
     markerUrl: "/marker_pattern/pattern-card.patt",
     modelUrl: "/models/tvanim/TV-anim.gltf",
     scale: [1, 1, 1],
-    rotation: [0, 0, 0],
+    rotation: [180, 90, -90],
     position: [0, 0, 0],
   };
 
