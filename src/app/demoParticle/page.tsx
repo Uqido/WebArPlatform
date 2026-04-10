@@ -23,6 +23,7 @@ export default function DemoParticlePage() {
     rotation: [180, 90, -90],
     position: [0, 0, 0],
     particleEffectName: "dust-particles",
+    enableInteraction: false,
   };
 
   const iframeSrc = `/marker-ar.html?${buildARQueryString(config)}`;

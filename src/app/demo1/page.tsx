@@ -22,6 +22,7 @@ export default function Demo1Page() {
     scale: [1, 1, 1],
     rotation: [180, 90, -90],
     position: [0, 0, 0],
+    enableInteraction: true,
   };
 
   const iframeSrc = `/marker-ar.html?${buildARQueryString(config)}`;

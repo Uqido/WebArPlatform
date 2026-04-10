@@ -11,6 +11,8 @@
     <script src="/ar-libs/aframe-master.min.js"></script>
     <script src="/ar-libs/aframe-ar.js"></script>
     <script src="/ar-libs/aframe-extras.min.js"></script>
+    <!-- npm package not available-->
+    <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
 
     <script>
       const headParams = new URLSearchParams(window.location.search);
@@ -36,11 +38,19 @@
       embedded
       arjs="sourceType: webcam; debugUIEnabled: false;"
       vr-mode-ui="enabled: false"
+      gesture-detector
     >
       <a-entity camera></a-entity>
     </a-scene>
 
     <script>
+      function parseUrlBoolean(value, defaultValue = false) {
+        if (value === null) {
+          return defaultValue;
+        }
+        return value.toLowerCase() === "true" || value === "1";
+      }
+
       //  Read params from URL
       const urlParams = new URLSearchParams(window.location.search);
       const markerType = urlParams.get("markerType");
@@ -50,6 +60,7 @@
       const rotation = urlParams.get("rotation") || "0 0 0";
       const position = urlParams.get("position") || "0 0 0";
       const particleEffectName = urlParams.get("particleEffectName");
+      const enableInteraction = urlParams.get("enableInteraction");
 
       if (modelUrl && markerType) {
         const scene = document.querySelector("a-scene");
@@ -62,6 +73,10 @@
         } else if (markerType === "preset") {
           marker.setAttribute("preset", markerUrl); // es: "hiro"
         }
+        // Set attributes for interactions
+        marker.setAttribute("raycaster", "objects: .clickable");
+        marker.setAttribute("emitevents", "true");
+        marker.setAttribute("cursor", "fuse: false; rayOrigin: mouse;");
 
         // Listener Marker
         marker.addEventListener("markerFound", () => {
@@ -79,9 +94,18 @@
         });
         //  Create 3D entity
         const modelEntity = document.createElement("a-entity");
+        modelEntity.setAttribute("id", "ar-model");
+
+        // Interaction management
+        if (parseUrlBoolean(enableInteraction, false)) {
+          modelEntity.setAttribute("class", "clickable");
+          modelEntity.setAttribute(
+            "gesture-handler",
+            "minScale: 0.1; maxScale: 10",
+          );
+        }
 
         // Animation management
-        modelEntity.setAttribute("id", "ar-model");
         modelEntity.setAttribute(
           "animation-mixer",
           "clip: *; loop: repeat; crossFadeDuration: 0.3",

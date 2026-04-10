@@ -4,12 +4,13 @@ export type Vector3 = [number, number, number];
 
 export interface ARConfig {
   markerType: "pattern" | "preset";
-  markerUrl: string;
+  markerUrl: string; //Url or preset type es. "hiro"
   modelUrl: string;
   scale: Vector3;
   rotation: Vector3;
   position: Vector3;
-  particleEffectName?: string;
+  particleEffectName?: string; //Effect to load, if any
+  enableInteraction: boolean; //Wheter the user can interact with the model
 }
 
 export interface UseIframeMessageProps {
