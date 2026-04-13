@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { ARConfig } from "@/types/ar";
 import { buildARQueryString, useIframeMessage } from "@/utils/arHelper";
 
-export default function Demo1Page() {
+export default function DemoParticlePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const [animations, setAnimations] = useState<string[]>([]);
@@ -22,7 +22,8 @@ export default function Demo1Page() {
     scale: [1, 1, 1],
     rotation: [180, 90, -90],
     position: [0, 0, 0],
-    enableInteraction: true,
+    particleEffectName: "dust-particles",
+    enableInteraction: false,
   };
 
   const iframeSrc = `/marker-ar.html?${buildARQueryString(config)}`;
@@ -88,7 +89,7 @@ export default function Demo1Page() {
               marginTop: 0,
             }}
           >
-            Demo1 - AR Active!
+            DemoParticle - AR Active!
           </h1>
           <p
             style={{

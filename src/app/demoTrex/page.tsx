@@ -12,6 +12,7 @@ export default function DemoTrexPage() {
     scale: [0.05, 0.05, 0.05],
     rotation: [-90, 0, 0],
     position: [0, 0, 0],
+    enableInteraction: false,
   };
 
   const iframeSrc = `/marker-ar.html?${buildARQueryString(config)}`;
