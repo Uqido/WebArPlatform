@@ -9,10 +9,7 @@ export default function Demo1Page() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const [animations, setAnimations] = useState<string[]>([]);
-
   const [activeAnim, setActiveAnim] = useState<string | null>(null);
-
-  // Track if marker is found
   const [isMarkerFound, setIsMarkerFound] = useState<boolean>(false);
 
   const config: ARConfig = {
@@ -27,7 +24,6 @@ export default function Demo1Page() {
 
   const iframeSrc = `/multi-marker-ar-demo.html?${buildARQueryString(config)}`;
 
-  // Listen for events from iframe
   useIframeMessage({
     setIsMarkerFound,
     setAnimations,
@@ -110,15 +106,15 @@ export default function Demo1Page() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "20px",
+            gap: "15px",
+            marginBottom: "50px",
           }}
         >
-          {/* Show buttons only if marker is found and animations exist */}
           {isMarkerFound && animations.length > 0 && (
             <div
               style={{
                 display: "flex",
-                gap: "10px",
+                gap: "8px",
                 flexWrap: "wrap",
                 justifyContent: "center",
               }}
@@ -128,7 +124,8 @@ export default function Demo1Page() {
                   key={animName}
                   onClick={() => handleAnimationClick(animName)}
                   style={{
-                    padding: "8px 16px",
+                    padding: "6px 12px",
+                    fontSize: "13px",
                     cursor: "pointer",
                     borderRadius: "6px",
                     border: "none",
@@ -153,12 +150,12 @@ export default function Demo1Page() {
             href="/"
             style={{
               display: "inline-block",
-              padding: "12px 24px",
+              padding: "8px 16px",
               backgroundColor: "#0070f3",
               color: "white",
               textDecoration: "none",
-              borderRadius: "8px",
-              fontSize: "16px",
+              borderRadius: "6px",
+              fontSize: "14px",
               fontWeight: "bold",
               boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
             }}

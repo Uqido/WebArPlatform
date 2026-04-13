@@ -6,54 +6,150 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no"
     />
-    <title>AR.js Demo - Optimized Touch</title>
+    <title>AR.js Demo - Toggle Raycaster</title>
     <style>
       body,
       html {
         margin: 0;
         overflow: hidden;
         background-color: transparent;
-        /* lock gesture from browser */
+        /* Blocca le gesture native del browser */
         touch-action: none;
       }
+
+      /* Stile per il pulsante di switch */
+      #raycaster-toggle {
+        position: absolute;
+        bottom: 20px; /* Distanza dal basso */
+        left: 20px; /* Distanza da sinistra */
+        z-index: 1000;
+        padding: 12px 24px;
+        font-family: sans-serif;
+        font-weight: bold;
+        background: #222;
+        color: #00ff00; /* Verde per Custom */
+        border: 2px solid white;
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      }
     </style>
+
     <script src="/ar-libs/aframe-master.min.js"></script>
     <script src="/ar-libs/aframe-ar.js"></script>
     <script src="/ar-libs/aframe-extras.min.js"></script>
     <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
 
     <script>
-      AFRAME.registerComponent("hitbox-interaction", {
+      AFRAME.registerComponent("absolute-touch-raycaster", {
         init: function () {
-          // Usiamo 'click' che gestisce nativamente sia mouse che touch in A-Frame
-          this.el.addEventListener("click", (e) => {
-            e.stopPropagation();
+          this.raycaster = new THREE.Raycaster();
+          this.mouse = new THREE.Vector2();
+          // Bindiamo la funzione per poterla rimuovere in seguito
+          this.onTouch = this.onTouch.bind(this);
+          window.addEventListener("touchstart", this.onTouch);
+        },
+        // Quando il componente viene rimosso, puliamo l'event listener!
+        remove: function () {
+          window.removeEventListener("touchstart", this.onTouch);
+        },
+        onTouch: function (e) {
+          if (e.touches.length > 1) return;
 
-            // 1. Disable gesture for all models
-            document.querySelectorAll("[gesture-handler]").forEach((item) => {
-              item.setAttribute("gesture-handler", "enabled", false);
-            });
+          const sceneEl = this.el;
+          const touch = e.touches[0];
+          const canvas = sceneEl.canvas;
+          if (!canvas) return;
 
-            // 2. Reset the color of ALL hitboxes back to red
-            document.querySelectorAll("[hitbox-interaction]").forEach((box) => {
-              box.setAttribute(
-                "material",
-                "color: red; wireframe: true; opacity: 0.5",
-              );
-            });
+          const rect = canvas.getBoundingClientRect();
+          this.mouse.x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+          this.mouse.y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
 
-            // 3. Enable gesture for parent of the hitbox
-            const parentModel = this.el.parentNode;
-            if (parentModel && parentModel.hasAttribute("gesture-handler")) {
-              parentModel.setAttribute("gesture-handler", "enabled", true);
+          const camera = sceneEl.camera;
+          if (!camera) return;
+
+          this.raycaster.setFromCamera(this.mouse, camera);
+
+          const hitboxes = document.querySelectorAll(".clickable");
+          const meshes = [];
+
+          hitboxes.forEach((hb) => {
+            const mesh = hb.getObject3D("mesh");
+            if (mesh) meshes.push(mesh);
+          });
+
+          const intersects = this.raycaster.intersectObjects(meshes, true);
+
+          if (intersects.length > 0) {
+            let hitObject = intersects[0].object;
+            let hitEl = hitObject.el;
+
+            while (!hitEl && hitObject.parent) {
+              hitObject = hitObject.parent;
+              hitEl = hitObject.el;
             }
 
-            // 4. Change the color of THIS specific hitbox to green (selected)
-            this.el.setAttribute(
+            if (hitEl) {
+              const parentModel = hitEl.parentNode;
+              if (parentModel && parentModel.hasAttribute("gesture-handler")) {
+                document
+                  .querySelectorAll("[gesture-handler]")
+                  .forEach((item) => {
+                    item.setAttribute("gesture-handler", "enabled", false);
+                  });
+
+                document.querySelectorAll(".clickable").forEach((box) => {
+                  box.setAttribute(
+                    "material",
+                    "color: red; wireframe: true; opacity: 0.5",
+                  );
+                });
+
+                parentModel.setAttribute("gesture-handler", "enabled", true);
+                hitEl.setAttribute(
+                  "material",
+                  "color: green; wireframe: true; opacity: 0.8",
+                );
+              }
+            }
+          }
+        },
+      });
+    </script>
+
+    <script>
+      AFRAME.registerComponent("hitbox-interaction", {
+        init: function () {
+          this.onClick = this.onClick.bind(this);
+          this.el.addEventListener("click", this.onClick);
+        },
+        // Pulizia eventi quando si spegne la modalità standard
+        remove: function () {
+          this.el.removeEventListener("click", this.onClick);
+        },
+        onClick: function (e) {
+          e.stopPropagation();
+
+          document.querySelectorAll("[gesture-handler]").forEach((item) => {
+            item.setAttribute("gesture-handler", "enabled", false);
+          });
+
+          document.querySelectorAll(".clickable").forEach((box) => {
+            box.setAttribute(
               "material",
-              "color: green; wireframe: true; opacity: 0.8",
+              "color: red; wireframe: true; opacity: 0.5",
             );
           });
+
+          const parentModel = this.el.parentNode;
+          if (parentModel && parentModel.hasAttribute("gesture-handler")) {
+            parentModel.setAttribute("gesture-handler", "enabled", true);
+          }
+
+          this.el.setAttribute(
+            "material",
+            "color: green; wireframe: true; opacity: 0.8",
+          );
         },
       });
     </script>
@@ -70,18 +166,17 @@
     </script>
   </head>
   <body>
+    <button id="raycaster-toggle">Modalità: CUSTOM RAYCASTER</button>
+
     <a-scene
+      id="main-scene"
       embedded
       arjs="sourceType: webcam; debugUIEnabled: false;"
       vr-mode-ui="enabled: false"
       gesture-detector
+      absolute-touch-raycaster
     >
-      <a-entity
-        camera
-        cursor="fuse: false; rayOrigin: mouse;"
-        raycaster="objects: .clickable"
-      >
-      </a-entity>
+      <a-entity id="main-camera" camera></a-entity>
 
       <a-marker preset="hiro" emitevents="true">
         <a-entity
@@ -95,7 +190,6 @@
         >
           <a-box
             class="clickable"
-            hitbox-interaction
             scale="1.2 1.2 1.2"
             position="0 0.5 0"
             material="color: red; wireframe: true; opacity: 0.5"
@@ -105,6 +199,43 @@
     </a-scene>
 
     <script>
+      // --- LOGICA DELLO SWITCH ---
+      let isCustomMode = true; // Partiamo con la modalità custom
+
+      function toggleRaycasterMode() {
+        const scene = document.getElementById("main-scene");
+        const camera = document.getElementById("main-camera");
+        const hitboxes = document.querySelectorAll(".clickable");
+        const btn = document.getElementById("raycaster-toggle");
+
+        if (isCustomMode) {
+          // Attiva STANDARD / Disattiva CUSTOM
+          scene.removeAttribute("absolute-touch-raycaster");
+          camera.setAttribute("cursor", "fuse: false; rayOrigin: mouse;");
+          camera.setAttribute("raycaster", "objects: .clickable");
+          hitboxes.forEach((hb) => hb.setAttribute("hitbox-interaction", ""));
+
+          btn.innerText = "Modalità: STANDARD (A-Frame)";
+          btn.style.color = "#FF4444"; // Rosso per standard
+          isCustomMode = false;
+        } else {
+          // Attiva CUSTOM / Disattiva STANDARD
+          hitboxes.forEach((hb) => hb.removeAttribute("hitbox-interaction"));
+          camera.removeAttribute("cursor");
+          camera.removeAttribute("raycaster");
+          scene.setAttribute("absolute-touch-raycaster", "");
+
+          btn.innerText = "Modalità: CUSTOM RAYCASTER";
+          btn.style.color = "#00FF00"; // Verde per custom
+          isCustomMode = true;
+        }
+      }
+
+      document
+        .getElementById("raycaster-toggle")
+        .addEventListener("click", toggleRaycasterMode);
+      // ----------------------------
+
       function parseUrlBoolean(value, defaultValue = false) {
         if (value === null) return defaultValue;
         return value.toLowerCase() === "true" || value === "1";
@@ -158,23 +289,25 @@
           "clip: *; loop: repeat; crossFadeDuration: 0.3",
         );
 
-        // Interaction management con Hitbox
         if (parseUrlBoolean(enableInteraction, false)) {
           modelEntity.setAttribute(
             "gesture-handler",
             "enabled: false; minScale: 0.1; maxScale: 10",
           );
 
-          // Create hitbox
           const hitbox = document.createElement("a-box");
           hitbox.setAttribute("class", "clickable");
-          hitbox.setAttribute("hitbox-interaction", "");
           hitbox.setAttribute("scale", "1.2 1.5 1.2");
           hitbox.setAttribute("position", "0 0.5 0");
           hitbox.setAttribute(
             "material",
             "color: red; wireframe: true; opacity: 0.5",
           );
+
+          // Se siamo passati in modalità standard PRIMA che il modello finisca di caricare
+          if (!isCustomMode) {
+            hitbox.setAttribute("hitbox-interaction", "");
+          }
 
           modelEntity.appendChild(hitbox);
         }
