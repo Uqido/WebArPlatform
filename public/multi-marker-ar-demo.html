@@ -13,21 +13,19 @@
         margin: 0;
         overflow: hidden;
         background-color: transparent;
-        /* Blocca le gesture native del browser */
         touch-action: none;
       }
 
-      /* Stile per il pulsante di switch */
       #raycaster-toggle {
         position: absolute;
-        bottom: 20px; /* Distanza dal basso */
-        left: 20px; /* Distanza da sinistra */
+        bottom: 20px;
+        left: 20px;
         z-index: 1000;
         padding: 12px 24px;
         font-family: sans-serif;
         font-weight: bold;
         background: #222;
-        color: #00ff00; /* Verde per Custom */
+        color: #00ff00;
         border: 2px solid white;
         border-radius: 8px;
         cursor: pointer;
@@ -45,11 +43,11 @@
         init: function () {
           this.raycaster = new THREE.Raycaster();
           this.mouse = new THREE.Vector2();
-          // Bindiamo la funzione per poterla rimuovere in seguito
+          // Bind function to remove it later
           this.onTouch = this.onTouch.bind(this);
           window.addEventListener("touchstart", this.onTouch);
         },
-        // Quando il componente viene rimosso, puliamo l'event listener!
+        // When component is removed, clean event listener
         remove: function () {
           window.removeEventListener("touchstart", this.onTouch);
         },
@@ -123,7 +121,6 @@
           this.onClick = this.onClick.bind(this);
           this.el.addEventListener("click", this.onClick);
         },
-        // Pulizia eventi quando si spegne la modalità standard
         remove: function () {
           this.el.removeEventListener("click", this.onClick);
         },
@@ -199,8 +196,7 @@
     </a-scene>
 
     <script>
-      // --- LOGICA DELLO SWITCH ---
-      let isCustomMode = true; // Partiamo con la modalità custom
+      let isCustomMode = true;
 
       function toggleRaycasterMode() {
         const scene = document.getElementById("main-scene");
@@ -209,24 +205,22 @@
         const btn = document.getElementById("raycaster-toggle");
 
         if (isCustomMode) {
-          // Attiva STANDARD / Disattiva CUSTOM
           scene.removeAttribute("absolute-touch-raycaster");
           camera.setAttribute("cursor", "fuse: false; rayOrigin: mouse;");
           camera.setAttribute("raycaster", "objects: .clickable");
           hitboxes.forEach((hb) => hb.setAttribute("hitbox-interaction", ""));
 
           btn.innerText = "Modalità: STANDARD (A-Frame)";
-          btn.style.color = "#FF4444"; // Rosso per standard
+          btn.style.color = "#FF4444";
           isCustomMode = false;
         } else {
-          // Attiva CUSTOM / Disattiva STANDARD
           hitboxes.forEach((hb) => hb.removeAttribute("hitbox-interaction"));
           camera.removeAttribute("cursor");
           camera.removeAttribute("raycaster");
           scene.setAttribute("absolute-touch-raycaster", "");
 
           btn.innerText = "Modalità: CUSTOM RAYCASTER";
-          btn.style.color = "#00FF00"; // Verde per custom
+          btn.style.color = "#00FF00";
           isCustomMode = true;
         }
       }
@@ -234,7 +228,6 @@
       document
         .getElementById("raycaster-toggle")
         .addEventListener("click", toggleRaycasterMode);
-      // ----------------------------
 
       function parseUrlBoolean(value, defaultValue = false) {
         if (value === null) return defaultValue;
@@ -304,7 +297,6 @@
             "color: red; wireframe: true; opacity: 0.5",
           );
 
-          // Se siamo passati in modalità standard PRIMA che il modello finisca di caricare
           if (!isCustomMode) {
             hitbox.setAttribute("hitbox-interaction", "");
           }
