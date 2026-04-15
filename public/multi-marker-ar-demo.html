@@ -38,35 +38,64 @@
     <script src="/ar-libs/aframe-extras.min.js"></script>
     <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
 
+    <!-- Enable console on smartphone -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+      eruda.init();
+    </script>
+
     <script>
       AFRAME.registerComponent("absolute-touch-raycaster", {
         init: function () {
           this.raycaster = new THREE.Raycaster();
+
+          this.raycaster.params.Points.threshold = 0.1;
+          this.raycaster.params.Line.threshold = 0.1;
+
           this.mouse = new THREE.Vector2();
-          // Bind function to remove it later
           this.onTouch = this.onTouch.bind(this);
-          window.addEventListener("touchstart", this.onTouch);
+
+          // { passive: false } to help distinguish touch from scroll
+          window.addEventListener("touchstart", this.onTouch, {
+            passive: false,
+          });
         },
-        // When component is removed, clean event listener
         remove: function () {
           window.removeEventListener("touchstart", this.onTouch);
         },
+
         onTouch: function (e) {
           if (e.touches.length > 1) return;
+          if (
+            e.target.tagName === "BUTTON" ||
+            e.target.closest("#raycaster-toggle")
+          )
+            return;
 
           const sceneEl = this.el;
           const touch = e.touches[0];
           const canvas = sceneEl.canvas;
-          if (!canvas) return;
+
+          if (!canvas) {
+            console.error("Canvas non trovato!");
+            return;
+          }
 
           const rect = canvas.getBoundingClientRect();
           this.mouse.x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
           this.mouse.y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
 
+          console.log(
+            `Touch registrato a: X:${this.mouse.x.toFixed(2)}, Y:${this.mouse.y.toFixed(2)}`,
+          );
+
           const camera = sceneEl.camera;
           if (!camera) return;
 
           this.raycaster.setFromCamera(this.mouse, camera);
+
+          // Update positions
+          sceneEl.object3D.updateMatrixWorld(true);
 
           const hitboxes = document.querySelectorAll(".clickable");
           const meshes = [];
@@ -78,7 +107,11 @@
 
           const intersects = this.raycaster.intersectObjects(meshes, true);
 
+          console.log(`Oggetti colpiti dal raggio: ${intersects.length}`);
+
           if (intersects.length > 0) {
+            console.log("HIT CONFERMATO!", intersects[0].object);
+
             let hitObject = intersects[0].object;
             let hitEl = hitObject.el;
 
@@ -178,7 +211,7 @@
       <a-marker preset="hiro" emitevents="true">
         <a-entity
           id="ar-model-tv"
-          gltf-model="/models/tvanim/TV-anim.gltf"
+          gltf-model="/models/tv_model/scene.gltf"
           animation-mixer="clip: *; loop: repeat; crossFadeDuration: 0.3"
           position="0 0 0"
           scale="1 1 1"
