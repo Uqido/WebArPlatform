@@ -19,9 +19,9 @@ export default function IceCorePage() {
     markerType: "nft",
     markerUrl: "./nft/ice-core/ice-core-target",
     modelUrl: "/models/ice-core/Wrapper.gltf",
-    scale: [1, 1, 1],
-    rotation: [180, 90, -90],
-    position: [0, 0, 0],
+    scale: [1.1, 1.1, 1.1],
+    rotation: [90, 180, 0],
+    position: [125, 0, -250],
     enableInteraction: true,
   };
 

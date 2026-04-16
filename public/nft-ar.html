@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no"
     />
-    <title>AR.js NFT Hardcoded</title>
+    <title>AR.js NFT Dynamic</title>
 
     <script src="/ar-libs/aframe-master.min.js"></script>
     <script src="/ar-libs/aframe-extras.min.js"></script>
@@ -59,8 +59,6 @@
     >
       <a-nft
         id="nft-marker"
-        type="nft"
-        url="./nft/ice-core/ice-core-target"
         smooth="true"
         smoothCount="20"
         smoothTolerance=".05"
@@ -69,14 +67,7 @@
         emitevents="true"
         cursor="fuse: false; rayOrigin: mouse;"
       >
-        <a-entity
-          id="ar-model"
-          gltf-model="/models/ice-core/Wrapper.gltf"
-          scale="1.1 1.1 1.1"
-          position="125 0 -250"
-          rotation="90 180 0"
-          class="clickable"
-        ></a-entity>
+        <a-entity id="ar-model" class="clickable"></a-entity>
       </a-nft>
 
       <a-entity camera></a-entity>
@@ -84,8 +75,29 @@
 
     <script>
       window.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        const markerType = urlParams.get("markerType") || "nft";
+        const markerUrl = urlParams.get("markerUrl");
+        const modelUrl = urlParams.get("modelUrl");
+        const scale = urlParams.get("scale") || "1 1 1";
+        const rotation = urlParams.get("rotation") || "0 0 0";
+        const position = urlParams.get("position") || "0 0 0";
+
         const marker = document.querySelector("#nft-marker");
         const modelEntity = document.querySelector("#ar-model");
+
+        if (marker && markerUrl) {
+          marker.setAttribute("type", markerType);
+          marker.setAttribute("url", markerUrl);
+        }
+
+        if (modelEntity && modelUrl) {
+          modelEntity.setAttribute("gltf-model", modelUrl);
+          modelEntity.setAttribute("scale", scale);
+          modelEntity.setAttribute("rotation", rotation);
+          modelEntity.setAttribute("position", position);
+        }
 
         if (marker) {
           marker.addEventListener("markerFound", () => {
@@ -120,10 +132,7 @@
         if (event.data?.type === "CHANGE_ANIMATION") {
           const modelEl = document.getElementById("ar-model");
           if (modelEl) {
-            // 1. Rimuoviamo il mixer per resettare la cache interna di A-Frame
             modelEl.removeAttribute("animation-mixer");
-
-            // 2. Usiamo setTimeout a 10ms per far capire ad A-Frame che è un nuovo comando
             setTimeout(() => {
               modelEl.setAttribute("animation-mixer", {
                 clip: event.data.clip,
