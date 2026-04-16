@@ -14,6 +14,7 @@ export function buildARQueryString(config: ARConfig): string {
   }).toString();
 }
 
+//TODO: flag for autoplay
 export function useIframeMessage({
   setIsMarkerFound,
   setAnimations,
@@ -30,18 +31,18 @@ export function useIframeMessage({
           setAnimations(loadedAnimations);
 
           // Set first animation as defaults
-          if (loadedAnimations.length > 0) {
-            const firstAnim = loadedAnimations[0];
-            setActiveAnim(firstAnim);
+          // if (loadedAnimations.length > 0) {
+          //   const firstAnim = loadedAnimations[0];
+          //   setActiveAnim(firstAnim);
 
-            // Play the first animation
-            if (iframeRef.current && iframeRef.current.contentWindow) {
-              iframeRef.current.contentWindow.postMessage(
-                { type: "CHANGE_ANIMATION", clip: firstAnim },
-                "*",
-              );
-            }
-          }
+          //   // Play the first animation
+          //   if (iframeRef.current && iframeRef.current.contentWindow) {
+          //     iframeRef.current.contentWindow.postMessage(
+          //       { type: "CHANGE_ANIMATION", clip: firstAnim },
+          //       "*",
+          //     );
+          //   }
+          // }
         }
       }
     };

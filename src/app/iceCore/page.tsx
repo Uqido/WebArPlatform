@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { ARConfig } from "@/types/ar";
 import { buildARQueryString, useIframeMessage } from "@/utils/arHelper";
 
-export default function Demo1Page() {
+export default function IceCorePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const [animations, setAnimations] = useState<string[]>([]);
@@ -16,8 +16,8 @@ export default function Demo1Page() {
   const [isMarkerFound, setIsMarkerFound] = useState<boolean>(false);
 
   const config: ARConfig = {
-    markerType: "pattern",
-    markerUrl: "/marker_pattern/pattern-card.patt",
+    markerType: "nft",
+    markerUrl: "./nft/ice-core/ice-core-target",
     modelUrl: "/models/ice-core/Wrapper.gltf",
     scale: [1, 1, 1],
     rotation: [180, 90, -90],
@@ -25,7 +25,7 @@ export default function Demo1Page() {
     enableInteraction: true,
   };
 
-  const iframeSrc = `/marker-ar.html?${buildARQueryString(config)}`;
+  const iframeSrc = `/nft-ar.html?${buildARQueryString(config)}`;
 
   // Listen for events from iframe
   useIframeMessage({
@@ -79,17 +79,6 @@ export default function Demo1Page() {
         }}
       >
         <div>
-          <h1
-            style={{
-              fontSize: "2.5rem",
-              marginBottom: "10px",
-              color: "#0f0",
-              textShadow: "2px 2px 5px rgba(0,0,0,0.8)",
-              marginTop: 0,
-            }}
-          >
-            Demo1 - AR Active!
-          </h1>
           <p
             style={{
               fontSize: "1.2rem",

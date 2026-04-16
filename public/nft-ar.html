@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>AR.js NFT Hardcoded</title>
+
+    <script src="/ar-libs/aframe-master.min.js"></script>
+    <script src="/ar-libs/aframe-extras.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+      eruda.init();
+    </script>
+
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: transparent;
+      }
+      .arjs-loader {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .arjs-loader div {
+        text-align: center;
+        color: white;
+        font-size: 1.25em;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="arjs-loader">
+      <div>Caricamento descrittori immagine...</div>
+    </div>
+
+    <a-scene
+      vr-mode-ui="enabled: false;"
+      renderer="logarithmicDepthBuffer: true;"
+      embedded
+      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+      gesture-detector
+    >
+      <a-nft
+        id="nft-marker"
+        type="nft"
+        url="./nft/ice-core/ice-core-target"
+        smooth="true"
+        smoothCount="20"
+        smoothTolerance=".05"
+        smoothThreshold="2"
+        raycaster="objects: .clickable"
+        emitevents="true"
+        cursor="fuse: false; rayOrigin: mouse;"
+      >
+        <a-entity
+          id="ar-model"
+          gltf-model="/models/ice-core/Wrapper.gltf"
+          scale="1.1 1.1 1.1"
+          position="125 0 -250"
+          rotation="90 180 0"
+          class="clickable"
+        ></a-entity>
+      </a-nft>
+
+      <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const marker = document.querySelector("#nft-marker");
+        const modelEntity = document.querySelector("#ar-model");
+
+        if (marker) {
+          marker.addEventListener("markerFound", () => {
+            window.parent.postMessage(
+              { type: "MARKER_STATE", isFound: true },
+              "*",
+            );
+          });
+          marker.addEventListener("markerLost", () => {
+            window.parent.postMessage(
+              { type: "MARKER_STATE", isFound: false },
+              "*",
+            );
+          });
+        }
+
+        if (modelEntity) {
+          modelEntity.addEventListener("model-loaded", (e) => {
+            const model = e.detail.model;
+            if (model?.animations?.length > 0) {
+              const animNames = model.animations.map((a) => a.name);
+              window.parent.postMessage(
+                { type: "ANIMATIONS_LOADED", animations: animNames },
+                "*",
+              );
+            }
+          });
+        }
+      });
+
+      window.addEventListener("message", (event) => {
+        if (event.data?.type === "CHANGE_ANIMATION") {
+          const modelEl = document.getElementById("ar-model");
+          if (modelEl) {
+            // 1. Rimuoviamo il mixer per resettare la cache interna di A-Frame
+            modelEl.removeAttribute("animation-mixer");
+
+            // 2. Usiamo setTimeout a 10ms per far capire ad A-Frame che è un nuovo comando
+            setTimeout(() => {
+              modelEl.setAttribute("animation-mixer", {
+                clip: event.data.clip,
+                loop: "once",
+                clampWhenFinished: true,
+                crossFadeDuration: 0.0,
+              });
+            }, 10);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

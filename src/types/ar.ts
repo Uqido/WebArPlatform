@@ -3,7 +3,7 @@ import { RefObject } from "react";
 export type Vector3 = [number, number, number];
 
 export interface ARConfig {
-  markerType: "pattern" | "preset";
+  markerType: "nft" | "pattern" | "preset";
   markerUrl: string; //Url or preset type es. "hiro"
   modelUrl: string;
   scale: Vector3;
