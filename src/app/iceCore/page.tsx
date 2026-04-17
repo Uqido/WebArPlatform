@@ -1,26 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRef, useState } from "react";
 import { ARConfig } from "@/types/ar";
 import { buildARQueryString, useIframeMessage } from "@/utils/arHelper";
 
 export default function IceCorePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-
   const [animations, setAnimations] = useState<string[]>([]);
-
   const [activeAnim, setActiveAnim] = useState<string | null>(null);
-
-  // Track if marker is found
   const [isMarkerFound, setIsMarkerFound] = useState<boolean>(false);
+  const [animationStarted, setAnimationStarted] = useState<boolean>(false);
 
   const config: ARConfig = {
     markerType: "nft",
     markerUrl: "./nft/ice-core/ice-core-target",
     modelUrl: "/models/ice-core/Wrapper.gltf",
-    scale: [170, 170, 170],
-    rotation: [90, 180, 0],
+    scale: [250, 250, 250],
+    rotation: [90, 165, 0],
     position: [125, 0, -250],
     enableInteraction: true,
   };
@@ -44,9 +42,13 @@ export default function IceCorePage() {
     }
   };
 
-  const handleAnimationClick = (animName: string) => {
-    setActiveAnim(animName);
-    changeAnimation(animName);
+  const handleScreenTouch = () => {
+    if (isMarkerFound && !animationStarted && animations.length > 0) {
+      const firstAnim = animations[0];
+      setActiveAnim(firstAnim);
+      changeAnimation(firstAnim);
+      setAnimationStarted(true);
+    }
   };
 
   return (
@@ -59,6 +61,45 @@ export default function IceCorePage() {
         backgroundColor: "#000",
       }}
     >
+      {/* Invisible overlay to capture the click*/}
+      {isMarkerFound && !animationStarted && (
+        <div
+          onClick={handleScreenTouch}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 8,
+            cursor: "pointer",
+          }}
+        />
+      )}
+
+      {/* Overlay image */}
+      <Image
+        src="/models/ice-core/Marker.jpg"
+        alt="Inquadra questa immagine"
+        width={512}
+        height={1024}
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          maxWidth: "80vw",
+          maxHeight: "80vh",
+          width: "auto",
+          height: "auto",
+          opacity: isMarkerFound ? 0 : 0.4,
+          transition: "opacity 0.6s ease-in-out",
+          pointerEvents: "none",
+          zIndex: 5,
+        }}
+        priority
+      />
+
       <div
         style={{
           position: "absolute",
@@ -78,69 +119,52 @@ export default function IceCorePage() {
           boxSizing: "border-box",
         }}
       >
-        <div>
-          <p
-            style={{
-              fontSize: "1.2rem",
-              color: "#fff",
-              textShadow: "1px 1px 3px rgba(0,0,0,0.8)",
-              margin: 0,
-            }}
-          >
-            {isMarkerFound
-              ? "Marker found! Play with animations."
-              : "Frame the marker."}
-          </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {!isMarkerFound && (
+            <p
+              style={{
+                fontSize: "1.2rem",
+                color: "#fff",
+                textShadow: "1px 1px 3px rgba(0,0,0,0.8)",
+                margin: 0,
+              }}
+            >
+              Frame the image to start
+            </p>
+          )}
+
+          {isMarkerFound && !animationStarted && (
+            <div
+              style={{
+                fontSize: "1.5rem",
+                color: "#fff",
+                fontWeight: "bold",
+                animation: "pulse 2s infinite",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+                textShadow: "2px 2px 6px rgba(0,0,0,0.9)",
+                pointerEvents: "none",
+              }}
+            >
+              Tocca per iniziare
+            </div>
+          )}
         </div>
 
+        {/* Go back button */}
         <div
           style={{
-            pointerEvents: "auto",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             gap: "20px",
+            marginBottom: "20px",
           }}
         >
-          {/* Show buttons only if marker is found and animations exist */}
-          {isMarkerFound && animations.length > 0 && (
-            <div
-              style={{
-                display: "flex",
-                gap: "10px",
-                flexWrap: "wrap",
-                justifyContent: "center",
-              }}
-            >
-              {animations.map((animName) => (
-                <button
-                  key={animName}
-                  onClick={() => handleAnimationClick(animName)}
-                  style={{
-                    padding: "8px 16px",
-                    cursor: "pointer",
-                    borderRadius: "6px",
-                    border: "none",
-                    backgroundColor:
-                      activeAnim === animName ? "#0070f3" : "#e0e0e0",
-                    color: activeAnim === animName ? "white" : "black",
-                    fontWeight: "bold",
-                    boxShadow:
-                      activeAnim === animName
-                        ? "0 2px 4px rgba(0,0,0,0.2)"
-                        : "none",
-                    transition: "all 0.2s ease-in-out",
-                  }}
-                >
-                  {animName}
-                </button>
-              ))}
-            </div>
-          )}
-
           <Link
             href="/"
             style={{
+              pointerEvents: "auto",
               display: "inline-block",
               padding: "12px 24px",
               backgroundColor: "#0070f3",
@@ -149,7 +173,7 @@ export default function IceCorePage() {
               borderRadius: "8px",
               fontSize: "16px",
               fontWeight: "bold",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
+              opacity: 0.8,
             }}
           >
             ← Back to the scanner
@@ -172,6 +196,24 @@ export default function IceCorePage() {
         allow="camera; gyroscope; accelerometer; magnetometer; vr;"
         title="AR Scanner"
       />
+
+      {/* Pulse effect */}
+      <style jsx>{`
+        @keyframes pulse {
+          0% {
+            transform: scale(1);
+            opacity: 0.8;
+          }
+          50% {
+            transform: scale(1.05);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 0.8;
+          }
+        }
+      `}</style>
     </div>
   );
 }
