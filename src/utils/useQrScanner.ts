@@ -10,6 +10,7 @@ const ALLOWED_IDS = [
   "demoModelViewer",
   "demoParticle",
   "iceCore",
+  "glacierInTime",
 ];
 
 export function useQrScanner() {
