@@ -1,4 +1,4 @@
-import { ARConfig, UseIframeMessageProps } from "@/types/ar";
+import { ARConfig, AROffsets, UseIframeMessageProps } from "@/types/ar";
 import { useEffect } from "react";
 
 export function buildARQueryString(config: ARConfig): string {
@@ -20,19 +20,20 @@ export function buildARQueryString(config: ARConfig): string {
  * TODO: Try on other devices if the offset is still valid or change.
  *
  */
-const IOS_OFFSETS = {
-  x: 40,
-  y: 0,
-  z: 0,
-};
 
 /**
  * Starting from the assumption that the original position is defined in android.
  * Adjust position for ios (?)
- *
  * With Pixel 7 center the model on the image. The offset should place the image on the center also on the iphone (14 Pro)
+ *
+ * Offeset to center the model on the image on Iphone14 pro.
+ * TODO: Try on other devices if the offset is still valid or change.
+ *
  */
-export function getAdjustedARConfig(baseConfig: ARConfig): ARConfig {
+export function getAdjustedARConfig(
+  baseConfig: ARConfig,
+  offsets: AROffsets,
+): ARConfig {
   if (typeof window === "undefined") return baseConfig;
 
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -41,9 +42,9 @@ export function getAdjustedARConfig(baseConfig: ARConfig): ARConfig {
     return {
       ...baseConfig,
       position: [
-        baseConfig.position[0] - IOS_OFFSETS.x,
-        baseConfig.position[1] - IOS_OFFSETS.y,
-        baseConfig.position[2] - IOS_OFFSETS.z,
+        baseConfig.position[0] + offsets.x,
+        baseConfig.position[1] + offsets.y,
+        baseConfig.position[2] + offsets.z,
       ] as [number, number, number],
     };
   }
