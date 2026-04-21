@@ -4,7 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { ARConfig } from "@/types/ar";
-import { buildARQueryString, useIframeMessage } from "@/utils/arHelper";
+import {
+  buildARQueryString,
+  getAdjustedARConfig,
+  useIframeMessage,
+} from "@/utils/arHelper";
 
 export default function IceCorePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -13,15 +17,17 @@ export default function IceCorePage() {
   const [isMarkerFound, setIsMarkerFound] = useState<boolean>(false);
   const [animationStarted, setAnimationStarted] = useState<boolean>(false);
 
-  const config: ARConfig = {
+  const baseConfig: ARConfig = {
     markerType: "nft",
     markerUrl: "./nft/ice-core/ice-core-target",
     modelUrl: "/models/ice-core/Wrapper.gltf",
-    scale: [1, 1, 1],
+    scale: [1.5, 1.5, 1.5],
     rotation: [80, 180, 0],
-    position: [125, 0, -250],
+    position: [135, 0, -125],
     enableInteraction: true,
   };
+
+  const config = getAdjustedARConfig(baseConfig);
 
   const iframeSrc = `/nft-ar.html?${buildARQueryString(config)}`;
 

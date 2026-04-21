@@ -14,6 +14,43 @@ export function buildARQueryString(config: ARConfig): string {
   }).toString();
 }
 
+/**
+ * Offeset to center the model on the image on Iphone14 pro.
+ *
+ * TODO: Try on other devices if the offset is still valid or change.
+ *
+ */
+const IOS_OFFSETS = {
+  x: 40,
+  y: 0,
+  z: 0,
+};
+
+/**
+ * Starting from the assumption that the original position is defined in android.
+ * Adjust position for ios (?)
+ *
+ * With Pixel 7 center the model on the image. The offset should place the image on the center also on the iphone (14 Pro)
+ */
+export function getAdjustedARConfig(baseConfig: ARConfig): ARConfig {
+  if (typeof window === "undefined") return baseConfig;
+
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if (isIOS) {
+    return {
+      ...baseConfig,
+      position: [
+        baseConfig.position[0] - IOS_OFFSETS.x,
+        baseConfig.position[1] - IOS_OFFSETS.y,
+        baseConfig.position[2] - IOS_OFFSETS.z,
+      ] as [number, number, number],
+    };
+  }
+
+  return baseConfig;
+}
+
 //TODO: flag for autoplay
 export function useIframeMessage({
   setIsMarkerFound,
