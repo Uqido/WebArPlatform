@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
     <title>AR.js NFT Dynamic</title>
 
@@ -52,22 +52,27 @@
 
     <a-scene
       vr-mode-ui="enabled: false;"
-      renderer="logarithmicDepthBuffer: true;"
+      renderer="logarithmicDepthBuffer: true; precision: high; antialias: false; alpha: true;"
       embedded
-      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; displayWidth: 1280; displayHeight: 720;"
       gesture-detector
     >
       <a-nft
         id="nft-marker"
         smooth="true"
-        smoothCount="20"
-        smoothTolerance=".05"
+        smoothCount="30"
+        smoothTolerance="0.2"
         smoothThreshold="2"
         raycaster="objects: .clickable"
         emitevents="true"
         cursor="fuse: false; rayOrigin: mouse;"
       >
         <a-entity id="ar-model" class="clickable"></a-entity>
+        <a-box
+          position="40 0 0"
+          scale="100 100 100"
+          material="color: red; opacity: 0.5;"
+        ></a-box>
       </a-nft>
 
       <a-entity camera></a-entity>
