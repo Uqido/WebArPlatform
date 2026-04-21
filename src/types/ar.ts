@@ -19,3 +19,9 @@ export interface UseIframeMessageProps {
   setActiveAnim: (anim: string | null) => void;
   iframeRef: RefObject<HTMLIFrameElement | null>;
 }
+
+export interface AROffsets {
+  x: number;
+  y: number;
+  z: number;
+}

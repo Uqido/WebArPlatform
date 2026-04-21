@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { ARConfig } from "@/types/ar";
+import { ARConfig, AROffsets } from "@/types/ar";
 import {
   buildARQueryString,
   getAdjustedARConfig,
@@ -27,7 +27,13 @@ export default function IceCorePage() {
     enableInteraction: true,
   };
 
-  const config = getAdjustedARConfig(baseConfig);
+  const IOS_OFFSETS: AROffsets = {
+    x: -40,
+    y: 0,
+    z: 0,
+  };
+
+  const config = getAdjustedARConfig(baseConfig, IOS_OFFSETS);
 
   const iframeSrc = `/nft-ar.html?${buildARQueryString(config)}`;
 
