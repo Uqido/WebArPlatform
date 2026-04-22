@@ -13,7 +13,7 @@ import {
 export default function IceCorePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [animations, setAnimations] = useState<string[]>([]);
-  const [activeAnim, setActiveAnim] = useState<string | null>(null);
+  const [, setActiveAnim] = useState<string | null>(null);
   const [isMarkerFound, setIsMarkerFound] = useState<boolean>(false);
   const [animationStarted, setAnimationStarted] = useState<boolean>(false);
 

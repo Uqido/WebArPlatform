@@ -13,7 +13,7 @@ import {
 export default function GlacierInTimePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [animations, setAnimations] = useState<string[]>([]);
-  const [activeAnim, setActiveAnim] = useState<string | null>(null);
+  const [, setActiveAnim] = useState<string | null>(null);
   const [isMarkerFound, setIsMarkerFound] = useState<boolean>(false);
   const [animationStarted, setAnimationStarted] = useState<boolean>(false);
 
@@ -32,7 +32,7 @@ export default function GlacierInTimePage() {
     markerType: "nft",
     markerUrl: "./nft/glacier-in-time/glacier-in-time-target",
     modelUrl: "/models/glacier-in-time/Wrapper.gltf",
-    scale: [280, 280, 280],
+    scale: [250, 250, 250],
     rotation: [0, 180, 0],
     position: [125, 0, -180],
     enableInteraction: false,
