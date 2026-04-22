@@ -3,8 +3,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { ARConfig } from "@/types/ar";
-import { buildARQueryString, useIframeMessage } from "@/utils/arHelper";
+import { ARConfig, AROffsets } from "@/types/ar";
+import {
+  buildARQueryString,
+  getAdjustedARConfig,
+  useIframeMessage,
+} from "@/utils/arHelper";
 
 export default function GlacierInTimePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -13,19 +17,27 @@ export default function GlacierInTimePage() {
   const [isMarkerFound, setIsMarkerFound] = useState<boolean>(false);
   const [animationStarted, setAnimationStarted] = useState<boolean>(false);
 
-  const config: ARConfig = {
+  const baseConfig: ARConfig = {
     markerType: "nft",
     markerUrl: "./nft/glacier-in-time/glacier-in-time-target",
     modelUrl: "/models/glacier-in-time/Wrapper.gltf",
-    scale: [250, 250, 250],
+    scale: [280, 280, 280],
     rotation: [0, 180, 0],
-    position: [125, 0, -250],
+    position: [125, 0, -180],
     enableInteraction: true,
   };
 
-  const markerImageUrl = "/models/glacier-in-time/Marker.jpg";
+  const IOS_OFFSETS: AROffsets = {
+    x: -40,
+    y: 0,
+    z: 0,
+  };
+
+  const config = getAdjustedARConfig(baseConfig, IOS_OFFSETS);
 
   const iframeSrc = `/nft-ar.html?${buildARQueryString(config)}`;
+
+  const markerImageUrl = "/models/glacier-in-time/Marker.jpg";
 
   // Listen for events from iframe
   useIframeMessage({
