@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { ARConfig, AROffsets } from "@/types/ar";
+import { ARConfig, AROffsets, CustomAnimation } from "@/types/ar";
 import {
   buildARQueryString,
   getAdjustedARConfig,
@@ -17,6 +17,17 @@ export default function GlacierInTimePage() {
   const [isMarkerFound, setIsMarkerFound] = useState<boolean>(false);
   const [animationStarted, setAnimationStarted] = useState<boolean>(false);
 
+  // 1. Reveal animation
+  const revealAnimation: CustomAnimation = {
+    name: "reveal",
+    config: {
+      type: "clip-z",
+      duration: 6000,
+      min: -1500,
+      max: 0,
+    },
+  };
+
   const baseConfig: ARConfig = {
     markerType: "nft",
     markerUrl: "./nft/glacier-in-time/glacier-in-time-target",
@@ -24,7 +35,8 @@ export default function GlacierInTimePage() {
     scale: [280, 280, 280],
     rotation: [0, 180, 0],
     position: [125, 0, -180],
-    enableInteraction: true,
+    enableInteraction: false,
+    customAnimation: revealAnimation,
   };
 
   const IOS_OFFSETS: AROffsets = {
@@ -57,9 +69,10 @@ export default function GlacierInTimePage() {
   };
 
   const handleScreenTouch = () => {
-    if (isMarkerFound && !animationStarted && animations.length > 0) {
-      const firstAnim = animations[0];
-      setActiveAnim(firstAnim);
+    if (isMarkerFound && !animationStarted) {
+      const firstAnim = animations.length > 0 ? animations[0] : "";
+      if (firstAnim) setActiveAnim(firstAnim);
+
       changeAnimation(firstAnim);
       setAnimationStarted(true);
     }
