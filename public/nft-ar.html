@@ -18,6 +18,70 @@
       eruda.init();
     </script>
 
+    <script>
+      AFRAME.registerComponent("print-reveal", {
+        schema: {
+          duration: { type: "number", default: 6000 }, // Durata in millisecondi (4 secondi)
+          minZ: { type: "number", default: -1500 }, // Partenza dalla profondità (da calibrare)
+          maxZ: { type: "number", default: 0 }, // Arrivo verso lo schermo (da calibrare)
+        },
+        init: function () {
+          // Abilita il clipping in Three.js
+          this.el.sceneEl.renderer.localClippingEnabled = true;
+
+          // Crea il piano rivolto verso l'asse Z (profondità)
+          // Se vuoi invertire l'effetto (che compare da davanti a dietro), cambia in (0, 0, 1)
+          this.clipPlane = new THREE.Plane(
+            new THREE.Vector3(0, 0, -1),
+            this.data.minZ,
+          );
+          this.animating = false;
+
+          // Applica il materiale di taglio quando il modello carica
+          this.el.addEventListener("model-loaded", (e) => {
+            const mesh = this.el.getObject3D("mesh");
+            if (mesh) {
+              mesh.traverse((node) => {
+                if (node.isMesh && node.material) {
+                  node.material.clippingPlanes = [this.clipPlane];
+                  node.material.clipShadows = true;
+                  node.material.needsUpdate = true;
+                }
+              });
+            }
+          });
+
+          // Ascolta il segnale per far partire l'animazione
+          this.el.addEventListener("start-reveal", () => {
+            if (!this.animating) this.startAnimation();
+          });
+        },
+
+        startAnimation: function () {
+          this.animating = true;
+          let startTime = Date.now();
+
+          const animate = () => {
+            let progress = (Date.now() - startTime) / this.data.duration;
+            if (progress > 1) progress = 1;
+
+            // Calcola la nuova posizione sulla profondità
+            this.clipPlane.constant =
+              this.data.minZ + (this.data.maxZ - this.data.minZ) * progress;
+
+            // Continua finché non raggiunge 1 (100%)
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            } else {
+              this.animating = false;
+            }
+          };
+
+          animate();
+        },
+      });
+    </script>
+
     <style>
       body {
         margin: 0;
@@ -67,7 +131,7 @@
         emitevents="true"
         cursor="fuse: false; rayOrigin: mouse;"
       >
-        <a-entity id="ar-model" class="clickable"></a-entity>
+        <a-entity id="ar-model" print-reveal class="clickable"></a-entity>
         <a-box
           position="40 0 0"
           scale="100 100 100"
@@ -146,6 +210,8 @@
                 crossFadeDuration: 0.0,
               });
             }, 10);
+
+            modelEl.emit("start-reveal");
           }
         }
       });
