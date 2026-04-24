@@ -11,6 +11,7 @@ const ALLOWED_IDS = [
   "demoParticle",
   "iceCore",
   "glacierInTime",
+  "glacierFormation",
 ];
 
 export function useQrScanner() {

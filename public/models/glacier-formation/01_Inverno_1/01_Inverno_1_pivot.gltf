@@ -1,0 +1,219 @@
+{
+  "asset": {
+    "generator": "UnityGltf 2.19.3, Unity 6000.3.13f1, URP",
+    "version": "2.0"
+  },
+  "extensionsUsed": [
+    "KHR_texture_transform",
+    "KHR_materials_transmission",
+    "KHR_materials_ior"
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ],
+      "name": "01_Inverno_1_pivot"
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 4,
+      "type": "VEC3",
+      "max": [
+        0.5,
+        0.5,
+        3.0616168005906746E-17
+      ],
+      "min": [
+        -0.5,
+        -0.5,
+        -3.0616168005906746E-17
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 4,
+      "type": "VEC3",
+      "max": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "min": [
+        0.0,
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 4,
+      "type": "VEC4",
+      "max": [
+        -1.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 4,
+      "type": "VEC2",
+      "max": [
+        1.0,
+        1.0
+      ],
+      "min": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5121,
+      "count": 6,
+      "type": "SCALAR",
+      "max": [
+        3.0
+      ],
+      "min": [
+        0.0
+      ]
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "01_Inverno_1_pivot.bin",
+      "byteLength": 200
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 48,
+      "byteStride": 12,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 48,
+      "byteLength": 48,
+      "byteStride": 12,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 96,
+      "byteLength": 64,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 160,
+      "byteLength": 32,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 192,
+      "byteLength": 8,
+      "target": 34963
+    }
+  ],
+  "images": [
+    {
+      "uri": "01_Inverno1.png",
+      "name": "01_Inverno1"
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0,
+          "extensions": {
+            "KHR_texture_transform": {
+              "texCoord": 0
+            }
+          }
+        },
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.5
+      },
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "name": "01_Inverno1",
+      "extensions": {
+        "KHR_materials_transmission": {},
+        "KHR_materials_ior": {
+          "ior": 1.0
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TANGENT": 2,
+            "TEXCOORD_0": 3
+          },
+          "indices": 4,
+          "material": 0
+        }
+      ],
+      "name": "01_Inverno_1"
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1
+      ],
+      "name": "01_Inverno_1_pivot"
+    },
+    {
+      "mesh": 0,
+      "scale": [
+        0.714,
+        1.0,
+        1.0
+      ],
+      "translation": [
+        -0.359,
+        0.5,
+        0.0
+      ],
+      "name": "01_Inverno_1"
+    }
+  ],
+  "samplers": [
+    {
+      "minFilter": 9987
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0,
+      "name": "01_Inverno1"
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>AR.js NFT Dynamic - Video WebM</title>
+
+    <script src="/ar-libs/aframe-master.min.js"></script>
+    <script src="/ar-libs/aframe-extras.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+      eruda.init();
+    </script>
+
+    <script>
+      AFRAME.registerComponent("video-controller", {
+        init: function () {
+          this.videoEl = document.querySelector("#ar-video-asset");
+          this.aVideo = document.querySelector("#ar-video");
+
+          const updateDimensions = () => {
+            const vWidth = this.videoEl.videoWidth;
+            const vHeight = this.videoEl.videoHeight;
+
+            if (!vWidth || !vHeight) return;
+
+            // Imposta larghezza e altezza esattamente uguali alla risoluzione del video
+            this.aVideo.setAttribute("width", vWidth);
+            this.aVideo.setAttribute("height", vHeight);
+
+            console.log(
+              `[AR Video] Dimensioni applicate esattamente a: ${vWidth}x${vHeight}`,
+            );
+          };
+
+          if (this.videoEl.readyState >= 1) {
+            console.log("[AR Video] Metadati già presenti al caricamento.");
+            updateDimensions();
+          } else {
+            console.log("[AR Video] In attesa dei metadati...");
+            this.videoEl.addEventListener("loadedmetadata", updateDimensions);
+          }
+
+          this.el.addEventListener("start-sequence", () => {
+            if (this.videoEl && this.videoEl.paused) {
+              this.videoEl.play().catch((err) => {
+                console.error("Errore autoplay video da React:", err);
+              });
+            }
+          });
+
+          window.addEventListener("click", () => {
+            if (this.videoEl && this.videoEl.paused) {
+              this.videoEl.play().catch((err) => {
+                console.error("Errore riproduzione video al click:", err);
+              });
+            }
+          });
+        },
+      });
+    </script>
+
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: transparent;
+      }
+      .arjs-loader {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .arjs-loader div {
+        text-align: center;
+        color: white;
+        font-size: 1.25em;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="arjs-loader">
+      <div>Caricamento descrittori immagine...</div>
+    </div>
+
+    <a-scene
+      video-controller
+      vr-mode-ui="enabled: false;"
+      renderer="logarithmicDepthBuffer: true; precision: high; antialias: false; alpha: true;"
+      embedded
+      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; displayWidth: 1280; displayHeight: 720;"
+      gesture-detector
+    >
+      <a-assets>
+        <video
+          id="ar-video-asset"
+          src="/video/GlacierFormationTrasp.webm"
+          preload="auto"
+          loop="false"
+          crossorigin="anonymous"
+          playsinline
+          webkit-playsinline
+        ></video>
+      </a-assets>
+
+      <a-nft
+        id="nft-marker"
+        smooth="true"
+        smoothCount="30"
+        smoothTolerance="0.2"
+        smoothThreshold="2"
+        raycaster="objects: .clickable"
+        emitevents="true"
+        cursor="fuse: false; rayOrigin: mouse;"
+      >
+        <a-video
+          id="ar-video"
+          src="#ar-video-asset"
+          rotation="90 0 180"
+          position="135 0 -160"
+          class="clickable"
+          scale="-0.24 0.3 1.0"
+        ></a-video>
+      </a-nft>
+
+      <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const markerType = urlParams.get("markerType") || "nft";
+        const markerUrl = urlParams.get("markerUrl");
+        const marker = document.querySelector("#nft-marker");
+
+        if (marker && markerUrl) {
+          marker.setAttribute("type", markerType);
+          marker.setAttribute("url", markerUrl);
+        }
+
+        if (marker) {
+          const onMarkerFound = () => {
+            const loader = document.querySelector(".arjs-loader");
+            if (loader) loader.style.display = "none";
+            window.parent.postMessage(
+              { type: "MARKER_STATE", isFound: true },
+              "*",
+            );
+          };
+
+          const onMarkerLost = () => {
+            // Mette in pausa il video quando si allontana l'inquadratura dal marker
+            const videoEl = document.querySelector("#ar-video-asset");
+            if (videoEl && !videoEl.paused) {
+              videoEl.pause();
+            }
+
+            window.parent.postMessage(
+              { type: "MARKER_STATE", isFound: false },
+              "*",
+            );
+          };
+
+          marker.addEventListener("markerFound", onMarkerFound);
+          marker.addEventListener("markerfound", onMarkerFound);
+          marker.addEventListener("markerLost", onMarkerLost);
+          marker.addEventListener("markerlost", onMarkerLost);
+        }
+      });
+
+      // Ascolto evento DA React per avviare il video
+      window.addEventListener("message", (event) => {
+        if (event.data?.type === "START_TRANSITION") {
+          const sceneEl = document.querySelector("a-scene");
+          if (sceneEl) {
+            sceneEl.emit("start-sequence");
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>AR.js NFT Dynamic - Continuous Fade</title>
+
+    <script src="/ar-libs/aframe-master.min.js"></script>
+    <script src="/ar-libs/aframe-extras.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+      eruda.init();
+    </script>
+
+    <script>
+      // Componente per l'intera sequenza automatica (1 -> 2 -> pausa -> 1)
+      AFRAME.registerComponent("continuous-fade", {
+        schema: {
+          duration: { type: "number", default: 2500 }, // Tempo per ogni singola dissolvenza
+          hold: { type: "number", default: 3000 }, // Tempo in cui il Modello 2 rimane visibile prima di tornare all'1
+        },
+        init: function () {
+          this.animating = false;
+
+          this.model1 = document.getElementById("ar-model-1");
+          this.model2 = document.getElementById("ar-model-2");
+
+          // Funzione per clonare e preparare i materiali (fondamentale per Three.js)
+          const setupMaterial = (el, initialOpacity) => {
+            el.addEventListener("model-loaded", () => {
+              const mesh = el.getObject3D("mesh");
+              if (mesh) {
+                mesh.traverse((node) => {
+                  if (node.isMesh && node.material) {
+                    node.material = node.material.clone();
+                    node.material.transparent = true;
+                    node.material.depthWrite = false;
+                    node.material.opacity = initialOpacity;
+                    node.material.needsUpdate = true;
+                  }
+                });
+              }
+            });
+          };
+
+          // Inizializzazione: Modello 1 visibile (1), Modello 2 invisibile (0)
+          if (this.model1) setupMaterial(this.model1, 1.0);
+          if (this.model2) setupMaterial(this.model2, 0.0);
+
+          // Ascolta il comando da React
+          this.el.addEventListener("start-sequence", () => {
+            if (!this.animating) {
+              this.startSequence();
+            }
+          });
+        },
+
+        // Funzione riutilizzabile per incrociare le opacità tra due elementi
+        crossfade: function (outEl, inEl, callback) {
+          let startTime = Date.now();
+          const duration = this.data.duration;
+
+          const outMesh = outEl.getObject3D("mesh");
+          const inMesh = inEl.getObject3D("mesh");
+
+          inEl.setAttribute("visible", "true"); // Assicurati che l'entrante sia nel DOM
+
+          const animate = () => {
+            let progress = (Date.now() - startTime) / duration;
+            if (progress > 1) progress = 1;
+
+            if (outMesh) {
+              outMesh.traverse((node) => {
+                if (node.isMesh && node.material)
+                  node.material.opacity = 1 - progress;
+              });
+            }
+
+            if (inMesh) {
+              inMesh.traverse((node) => {
+                if (node.isMesh && node.material)
+                  node.material.opacity = progress;
+              });
+            }
+
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            } else {
+              outEl.setAttribute("visible", "false"); // Nascondi completamente l'uscente
+              if (callback) callback(); // Avvia lo step successivo
+            }
+          };
+
+          animate();
+        },
+
+        startSequence: function () {
+          this.animating = true;
+          console.log("Fase 1: Inverno sfuma in Estate...");
+
+          // Step 1: Modello 1 -> Modello 2
+          this.crossfade(this.model1, this.model2, () => {
+            console.log(`Pausa di ${this.data.hold}ms...`);
+
+            // Step 2: Pausa (hold)
+            setTimeout(() => {
+              console.log("Fase 2: Estate sfuma tornando a Inverno...");
+
+              // Step 3: Modello 2 -> Modello 1
+              this.crossfade(this.model2, this.model1, () => {
+                console.log("Sequenza completata!");
+                this.animating = false; // Fine! Pronto per un eventuale nuovo click.
+              });
+            }, this.data.hold);
+          });
+        },
+      });
+    </script>
+
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: transparent;
+      }
+      .arjs-loader {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .arjs-loader div {
+        text-align: center;
+        color: white;
+        font-size: 1.25em;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="arjs-loader">
+      <div>Caricamento descrittori immagine...</div>
+    </div>
+
+    <a-scene
+      continuous-fade="duration: 2500; hold: 3000"
+      vr-mode-ui="enabled: false;"
+      renderer="logarithmicDepthBuffer: true; precision: high; antialias: false; alpha: true;"
+      embedded
+      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; displayWidth: 1280; displayHeight: 720;"
+      gesture-detector
+    >
+      <a-nft
+        id="nft-marker"
+        smooth="true"
+        smoothCount="30"
+        smoothTolerance="0.2"
+        smoothThreshold="2"
+        raycaster="objects: .clickable"
+        emitevents="true"
+        cursor="fuse: false; rayOrigin: mouse;"
+      >
+        <a-entity
+          id="ar-model-2"
+          gltf-model="/models/glacier-formation/02_Estate_1/02_Estate_1_pivot.gltf"
+          scale="300 300 300"
+          rotation="90 0 180"
+          position="40 0 0"
+          class="clickable"
+          visible="false"
+        >
+        </a-entity>
+
+        <a-entity
+          id="ar-model-1"
+          gltf-model="/models/glacier-formation/01_Inverno_1/01_Inverno_1_pivot.gltf"
+          scale="300 300 300"
+          rotation="90 0 180"
+          position="40 0 0"
+          class="clickable"
+          visible="true"
+        >
+        </a-entity>
+      </a-nft>
+
+      <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const markerType = urlParams.get("markerType") || "nft";
+        const markerUrl = urlParams.get("markerUrl");
+        const marker = document.querySelector("#nft-marker");
+
+        if (marker && markerUrl) {
+          marker.setAttribute("type", markerType);
+          marker.setAttribute("url", markerUrl);
+        }
+
+        if (marker) {
+          const onMarkerFound = () => {
+            const loader = document.querySelector(".arjs-loader");
+            if (loader) loader.style.display = "none";
+            window.parent.postMessage(
+              { type: "MARKER_STATE", isFound: true },
+              "*",
+            );
+          };
+
+          const onMarkerLost = () => {
+            window.parent.postMessage(
+              { type: "MARKER_STATE", isFound: false },
+              "*",
+            );
+          };
+
+          marker.addEventListener("markerFound", onMarkerFound);
+          marker.addEventListener("markerfound", onMarkerFound);
+          marker.addEventListener("markerLost", onMarkerLost);
+          marker.addEventListener("markerlost", onMarkerLost);
+        }
+      });
+
+      // Ascolto evento DA React per avviare l'intera sequenza
+      window.addEventListener("message", (event) => {
+        if (event.data?.type === "START_TRANSITION") {
+          const sceneEl = document.querySelector("a-scene");
+          if (sceneEl) {
+            sceneEl.emit("start-sequence");
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
