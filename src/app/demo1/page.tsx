@@ -18,7 +18,7 @@ export default function Demo1Page() {
   const config: ARConfig = {
     markerType: "pattern",
     markerUrl: "/marker_pattern/pattern-card.patt",
-    modelUrl: "/models/ice-core/Wrapper.gltf",
+    modelUrl: "/models/tvanim/TV-anim.gltf",
     scale: [1, 1, 1],
     rotation: [180, 90, -90],
     position: [0, 0, 0],

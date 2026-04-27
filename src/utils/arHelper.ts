@@ -67,20 +67,6 @@ export function useIframeMessage({
         } else if (event.data.type === "ANIMATIONS_LOADED") {
           const loadedAnimations = event.data.animations;
           setAnimations(loadedAnimations);
-
-          // Set first animation as defaults
-          // if (loadedAnimations.length > 0) {
-          //   const firstAnim = loadedAnimations[0];
-          //   setActiveAnim(firstAnim);
-
-          //   // Play the first animation
-          //   if (iframeRef.current && iframeRef.current.contentWindow) {
-          //     iframeRef.current.contentWindow.postMessage(
-          //       { type: "CHANGE_ANIMATION", clip: firstAnim },
-          //       "*",
-          //     );
-          //   }
-          // }
         }
       }
     };
