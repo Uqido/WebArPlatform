@@ -18,6 +18,73 @@
       eruda.init();
     </script>
 
+    <script>
+      AFRAME.registerComponent("print-reveal", {
+        schema: {
+          type: { type: "string", default: "clip-z" }, // 'clip-x', 'clip-y', 'clip-z'
+          duration: { type: "number", default: 6000 },
+          min: { type: "number", default: -1500 },
+          max: { type: "number", default: 0 },
+        },
+        init: function () {
+          this.el.sceneEl.renderer.localClippingEnabled = true;
+          this.animating = false;
+
+          // Plane direction wrt to the type
+          let normalVector;
+          if (this.data.type === "clip-x") {
+            normalVector = new THREE.Vector3(-1, 0, 0);
+          } else if (this.data.type === "clip-y") {
+            normalVector = new THREE.Vector3(0, -1, 0);
+          } else {
+            normalVector = new THREE.Vector3(0, 0, -1);
+          }
+
+          this.clipPlane = new THREE.Plane(normalVector, this.data.min);
+
+          // Apply clip plane when model is loaded
+          this.el.addEventListener("model-loaded", (e) => {
+            const mesh = this.el.getObject3D("mesh");
+            if (mesh) {
+              mesh.traverse((node) => {
+                if (node.isMesh && node.material) {
+                  node.material.clippingPlanes = [this.clipPlane];
+                  node.material.clipShadows = true;
+                  node.material.needsUpdate = true;
+                }
+              });
+            }
+          });
+
+          this.el.addEventListener("start-3js-anim", () => {
+            if (!this.animating) this.startAnimation();
+          });
+        },
+
+        startAnimation: function () {
+          this.animating = true;
+          let startTime = Date.now();
+
+          const animate = () => {
+            let progress = (Date.now() - startTime) / this.data.duration;
+            if (progress > 1) progress = 1;
+
+            // Compute new position for the plane
+            this.clipPlane.constant =
+              this.data.min + (this.data.max - this.data.min) * progress;
+
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            } else {
+              this.animating = false;
+            }
+          };
+
+          animate();
+        },
+      });
+    </script>
+
     <style>
       body {
         margin: 0;
@@ -89,6 +156,9 @@
         const rotation = urlParams.get("rotation") || "0 0 0";
         const position = urlParams.get("position") || "0 0 0";
 
+        // Animation config
+        const customAnimationParam = urlParams.get("customAnimation");
+
         const marker = document.querySelector("#nft-marker");
         const modelEntity = document.querySelector("#ar-model");
 
@@ -102,6 +172,36 @@
           modelEntity.setAttribute("scale", scale);
           modelEntity.setAttribute("rotation", rotation);
           modelEntity.setAttribute("position", position);
+
+          // Manage three.js animation
+          if (customAnimationParam) {
+            try {
+              const animationData = JSON.parse(customAnimationParam);
+
+              //Manage reveal animation
+              if (
+                animationData &&
+                animationData.name === "reveal" &&
+                animationData.config
+              ) {
+                const cfg = animationData.config;
+
+                let revealConfigStr = `type: ${cfg.type || "clip-z"};`;
+                if (cfg.duration !== undefined)
+                  revealConfigStr += ` duration: ${cfg.duration};`;
+                if (cfg.min !== undefined)
+                  revealConfigStr += ` min: ${cfg.min};`;
+                if (cfg.max !== undefined)
+                  revealConfigStr += ` max: ${cfg.max};`;
+
+                modelEntity.setAttribute("print-reveal", revealConfigStr);
+              }
+
+              //Add other animation management
+            } catch (error) {
+              console.error("Errore nel parsing di customAnimation:", error);
+            }
+          }
         }
 
         if (marker) {
@@ -128,6 +228,11 @@
                 { type: "ANIMATIONS_LOADED", animations: animNames },
                 "*",
               );
+            } else {
+              window.parent.postMessage(
+                { type: "ANIMATIONS_LOADED", animations: [] },
+                "*",
+              );
             }
           });
         }
@@ -137,15 +242,20 @@
         if (event.data?.type === "CHANGE_ANIMATION") {
           const modelEl = document.getElementById("ar-model");
           if (modelEl) {
-            modelEl.removeAttribute("animation-mixer");
-            setTimeout(() => {
-              modelEl.setAttribute("animation-mixer", {
-                clip: event.data.clip,
-                loop: "once",
-                clampWhenFinished: true,
-                crossFadeDuration: 0.0,
-              });
-            }, 10);
+            if (event.data.clip) {
+              modelEl.removeAttribute("animation-mixer");
+              setTimeout(() => {
+                modelEl.setAttribute("animation-mixer", {
+                  clip: event.data.clip,
+                  loop: "once",
+                  clampWhenFinished: true,
+                  crossFadeDuration: 0.0,
+                });
+              }, 10);
+            }
+
+            // Start three.js animation
+            modelEl.emit("start-3js-anim");
           }
         }
       });

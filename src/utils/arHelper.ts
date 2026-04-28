@@ -2,7 +2,8 @@ import { ARConfig, AROffsets, UseIframeMessageProps } from "@/types/ar";
 import { useEffect } from "react";
 
 export function buildARQueryString(config: ARConfig): string {
-  return new URLSearchParams({
+  // Prepariamo i parametri base
+  const params: Record<string, string> = {
     markerType: config.markerType,
     markerUrl: config.markerUrl,
     modelUrl: config.modelUrl,
@@ -11,7 +12,14 @@ export function buildARQueryString(config: ARConfig): string {
     position: config.position.join(" "),
     particleEffectName: config.particleEffectName ?? "",
     enableInteraction: config.enableInteraction.toString(),
-  }).toString();
+  };
+
+  // If animation config is present
+  if (config.customAnimation) {
+    params.customAnimation = JSON.stringify(config.customAnimation);
+  }
+
+  return new URLSearchParams(params).toString();
 }
 
 /**
