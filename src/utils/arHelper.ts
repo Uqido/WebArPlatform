@@ -1,8 +1,9 @@
-import { ARConfig, UseIframeMessageProps } from "@/types/ar";
+import { ARConfig, AROffsets, UseIframeMessageProps } from "@/types/ar";
 import { useEffect } from "react";
 
 export function buildARQueryString(config: ARConfig): string {
-  return new URLSearchParams({
+  // Prepariamo i parametri base
+  const params: Record<string, string> = {
     markerType: config.markerType,
     markerUrl: config.markerUrl,
     modelUrl: config.modelUrl,
@@ -11,9 +12,55 @@ export function buildARQueryString(config: ARConfig): string {
     position: config.position.join(" "),
     particleEffectName: config.particleEffectName ?? "",
     enableInteraction: config.enableInteraction.toString(),
-  }).toString();
+  };
+
+  // If animation config is present
+  if (config.customAnimation) {
+    params.customAnimation = JSON.stringify(config.customAnimation);
+  }
+
+  return new URLSearchParams(params).toString();
 }
 
+/**
+ * Offeset to center the model on the image on Iphone14 pro.
+ *
+ * TODO: Try on other devices if the offset is still valid or change.
+ *
+ */
+
+/**
+ * Starting from the assumption that the original position is defined in android.
+ * Adjust position for ios (?)
+ * With Pixel 7 center the model on the image. The offset should place the image on the center also on the iphone (14 Pro)
+ *
+ * Offeset to center the model on the image on Iphone14 pro.
+ * TODO: Try on other devices if the offset is still valid or change.
+ *
+ */
+export function getAdjustedARConfig(
+  baseConfig: ARConfig,
+  offsets: AROffsets,
+): ARConfig {
+  if (typeof window === "undefined") return baseConfig;
+
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if (isIOS) {
+    return {
+      ...baseConfig,
+      position: [
+        baseConfig.position[0] + offsets.x,
+        baseConfig.position[1] + offsets.y,
+        baseConfig.position[2] + offsets.z,
+      ] as [number, number, number],
+    };
+  }
+
+  return baseConfig;
+}
+
+//TODO: flag for autoplay
 export function useIframeMessage({
   setIsMarkerFound,
   setAnimations,
@@ -28,20 +75,6 @@ export function useIframeMessage({
         } else if (event.data.type === "ANIMATIONS_LOADED") {
           const loadedAnimations = event.data.animations;
           setAnimations(loadedAnimations);
-
-          // Set first animation as defaults
-          if (loadedAnimations.length > 0) {
-            const firstAnim = loadedAnimations[0];
-            setActiveAnim(firstAnim);
-
-            // Play the first animation
-            if (iframeRef.current && iframeRef.current.contentWindow) {
-              iframeRef.current.contentWindow.postMessage(
-                { type: "CHANGE_ANIMATION", clip: firstAnim },
-                "*",
-              );
-            }
-          }
         }
       }
     };

@@ -11,8 +11,12 @@
     <script src="/ar-libs/aframe-master.min.js"></script>
     <script src="/ar-libs/aframe-ar.js"></script>
     <script src="/ar-libs/aframe-extras.min.js"></script>
-    <!-- npm package not available-->
     <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+      eruda.init();
+    </script>
 
     <script>
       const headParams = new URLSearchParams(window.location.search);
@@ -104,12 +108,6 @@
             "minScale: 0.1; maxScale: 10",
           );
         }
-
-        // Animation management
-        modelEntity.setAttribute(
-          "animation-mixer",
-          "clip: *; loop: repeat; crossFadeDuration: 0.3",
-        );
 
         modelEntity.setAttribute("gltf-model", modelUrl);
         modelEntity.setAttribute("position", position);

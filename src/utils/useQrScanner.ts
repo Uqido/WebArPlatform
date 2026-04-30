@@ -9,6 +9,8 @@ const ALLOWED_IDS = [
   "demoTrex",
   "demoModelViewer",
   "demoParticle",
+  "iceCore",
+  "glacierInTime",
   "demoMulti",
 ];
 
