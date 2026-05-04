@@ -1,4 +1,3 @@
-// useQrScanner.ts
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import jsQR from "jsqr";
@@ -18,7 +17,7 @@ export function useQrScanner() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const requestRef = useRef<number | null>(null);
-  const hasRequested = useRef(false);
+  const streamRef = useRef<MediaStream | null>(null);
 
   // Guard to prevent multiple scans/redirects while processing
   const isProcessing = useRef(false);
@@ -29,41 +28,17 @@ export function useQrScanner() {
     parameters: Record<string, string>;
   } | null>(null);
 
-  const scanFrame = () => {
-    const video = videoRef.current;
+  // Helper to create a cooldown between scans
+  function pauseScanner() {
+    isProcessing.current = true;
+    setTimeout(() => {
+      isProcessing.current = false;
+      setState("Scanning...");
+    }, 1500);
+  }
 
-    // Skip frame if processing or video not ready
-    if (
-      isProcessing.current ||
-      !video ||
-      video.readyState !== video.HAVE_ENOUGH_DATA
-    ) {
-      requestRef.current = requestAnimationFrame(scanFrame);
-      return;
-    }
-
-    if (!canvasRef.current)
-      canvasRef.current = document.createElement("canvas");
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
-    if (ctx) {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height, {
-        inversionAttempts: "dontInvert",
-      });
-
-      if (code) {
-        analyzeUrl(code.data);
-      }
-    }
-    requestRef.current = requestAnimationFrame(scanFrame);
-  };
-
-  const analyzeUrl = (qrString: string) => {
+  // Analyze url from QR
+  function analyzeUrl(qrString: string) {
     try {
       const correctUrl = new URL(qrString);
       const parameters = Object.fromEntries(correctUrl.searchParams.entries());
@@ -98,86 +73,105 @@ export function useQrScanner() {
       setQrData({ originalUrl: qrString, parameters: {} });
       pauseScanner();
     }
-  };
+  }
 
-  // Helper to create a cooldown between scans
-  const pauseScanner = () => {
-    isProcessing.current = true;
-    setTimeout(() => {
-      isProcessing.current = false;
-      setState("Scanning...");
-    }, 1500);
-  };
+  // Scan frame
+  function scanFrame() {
+    const video = videoRef.current;
 
-  useEffect(() => {
-    if (hasRequested.current) return;
-    hasRequested.current = true;
+    // Skip frame if processing or video not ready
+    if (
+      isProcessing.current ||
+      !video ||
+      video.readyState !== video.HAVE_ENOUGH_DATA
+    ) {
+      requestRef.current = requestAnimationFrame(scanFrame);
+      return;
+    }
 
-    //Variable to keep track of the stream
-    let currentStream: MediaStream | null = null;
+    if (!canvasRef.current) {
+      canvasRef.current = document.createElement("canvas");
+    }
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-    const startCamera = async () => {
-      try {
-        if (!navigator.mediaDevices?.getUserMedia) {
-          setState(
-            "Camera API blocked or not supported. Check HTTPS/localhost.",
-          );
-          return;
-        }
+    if (ctx) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height, {
+        inversionAttempts: "dontInvert",
+      });
 
-        const isMobile =
-          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent,
-          ) || navigator.maxTouchPoints > 0;
-
-        const videoConstraints = isMobile
-          ? { facingMode: { ideal: "environment" } }
-          : true;
-
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: videoConstraints,
-        });
-
-        currentStream = stream;
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.setAttribute("playsinline", "true");
-          await videoRef.current.play();
-
-          setState("Scanning...");
-          requestRef.current = requestAnimationFrame(scanFrame);
-        }
-      } catch (err) {
-        if (err instanceof DOMException && err.name === "NotFoundError") {
-          setState("Error: No camera found on this device.");
-        } else if (
-          err instanceof DOMException &&
-          err.name === "NotAllowedError"
-        ) {
-          setState(
-            "Error: Camera permission denied. Please allow camera access.",
-          );
-        } else if (err instanceof Error) {
-          setState(`Camera error: ${err.message}`);
-        }
-        console.error("getUserMedia error:", err);
+      if (code) {
+        analyzeUrl(code.data);
       }
-    };
+    }
+    requestRef.current = requestAnimationFrame(scanFrame);
+  }
 
-    startCamera();
+  // Start Camera
+  async function startCamera() {
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setState("Camera API blocked or not supported. Check HTTPS/localhost.");
+        return;
+      }
 
+      const isMobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent,
+        ) || navigator.maxTouchPoints > 0;
+
+      const videoConstraints = isMobile
+        ? { facingMode: { ideal: "environment" } }
+        : true;
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: videoConstraints,
+      });
+
+      streamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.setAttribute("playsinline", "true");
+        await videoRef.current.play();
+
+        setState("Scanning...");
+        requestRef.current = requestAnimationFrame(scanFrame);
+      }
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "NotFoundError") {
+        setState("Error: No camera found on this device.");
+      } else if (
+        err instanceof DOMException &&
+        err.name === "NotAllowedError"
+      ) {
+        setState(
+          "Error: Camera permission denied. Please allow camera access.",
+        );
+      } else if (err instanceof Error) {
+        setState(`Camera error: ${err.message}`);
+      }
+      console.error("getUserMedia error:", err);
+    }
+  }
+
+  // Clean up on unmount
+  useEffect(() => {
     return () => {
-      hasRequested.current = false;
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
 
-      // Shut down stram using local variable.
-      if (currentStream) {
-        currentStream.getTracks().forEach((track) => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => {
           track.stop();
         });
       }
     };
   }, []);
-  return { videoRef, state, qrData };
+
+  // Expose startCamera to the component
+  return { videoRef, state, qrData, startCamera };
 }
