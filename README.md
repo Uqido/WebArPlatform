@@ -137,3 +137,11 @@ Here is an example of how the `postinstall` command looks:
 ### Step 2.2: Create a Static HTML Entry Point
 
 Create a new HTML file in the `public/` directory (e.g., `public/my-custom-ar.html`). This file will host the A-Frame scene and your new library.
+
+# Export a Gltf from Unity
+
+First we need the UnityGltf package. It can be added from the following github repository: https://github.com/KhronosGroup/UnityGLTF.git
+
+Once done, to export a model, we have to right click on the game object, select **UnityGLTF** and **Export Selected**.
+
+To modify the export settings, for example to allow the animation export, we can select the **Open export Settings** option.
