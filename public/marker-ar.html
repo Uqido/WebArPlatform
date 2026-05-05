@@ -14,6 +14,12 @@
     <!-- npm package not available-->
     <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
 
+    <!-- Enable console on smartphone-->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+      eruda.init();
+    </script>
+
     <script>
       const headParams = new URLSearchParams(window.location.search);
       const effectToLoad = headParams.get("particleEffectName");
