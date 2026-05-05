@@ -36,7 +36,7 @@ The main structure of the project is organized as follows:
   - **`ar-libs/`**: External libraries for Augmented Reality (e.g., `aframe-ar.js`, `aframe-master.js`).
   - **`particles/`**: Scripts for particle effects (`dust-particles.js`).
   - Also contains static HTML files for tracking based on markers or NFTs (`marker-ar.html`, `nft-ar.html`).
-- **`src/app/`**: The core of the Next.js application (App Router). Each subfolder represents a route (e.g., `demo1`, `demoTrex`, `glacierInTime`) and contains its own `page.tsx`.
+- **`src/app/`**: The core of the Next.js application (App Router). Each subfolder represents a route (e.g.,`glacierInTime`, `iceCore`) and contains its own `page.tsx`.
 - **`src/components/`**: Contains reusable React components (e.g., `ModelViewer.jsx`).
 - **`src/types/`**: Contains TypeScript type definitions to support the AR libraries (`ar.ts`).
 - **`src/utils/`**: Utility functions and custom hooks (e.g., `arHelper.ts`, `useQrScanner.ts`).
@@ -69,7 +69,6 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { ARConfig } from "@/types/ar";
 import { buildARQueryString, useIframeMessage } from "@/utils/arHelper";
-[cite_start]; //
 
 export default function MyNewExperiencePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -110,12 +109,12 @@ export default function MyNewExperiencePage() {
 }
 ```
 
-## 2. How to Add and Use a New AR Library
+## 2. How to add and use a new AR Library
 
 Because AR libraries (especially A-Frame based ones) often require direct DOM manipulation and specific meta tags that conflict with React's virtual DOM, the platform uses an **Iframe Architecture**.
 AR libraries are loaded in static HTML files inside the `public/` folder, and the Next.js pages display them via an `<iframe>`.
 
-### Step 2.1: Add the Library Files
+### Step 2.1: Add the library files
 
 You have two options for adding new library files to your project:
 
@@ -134,7 +133,7 @@ Here is an example of how the `postinstall` command looks:
 "postinstall": "shx mkdir -p public/ar-libs && shx cp -f \"node_modules/aframe/dist/*.js\" public/ar-libs/ && shx cp -f node_modules/@ar-js-org/ar.js/aframe/build/aframe-ar.js public/ar-libs/ && shx cp -f node_modules/aframe-extras/dist/aframe-extras.min.js public/ar-libs/"
 ```
 
-### Step 2.2: Create a Static HTML Entry Point
+### Step 2.2: Create a static HTML entry point
 
 Create a new HTML file in the `public/` directory (e.g., `public/my-custom-ar.html`). This file will host the A-Frame scene and your new library.
 
