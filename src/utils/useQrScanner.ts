@@ -22,6 +22,10 @@ export function useQrScanner() {
   // Guard to prevent multiple scans/redirects while processing
   const isProcessing = useRef(false);
 
+  // Refs for safely handling timeouts and component unmounting
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isMounted = useRef<boolean>(true);
+
   const [state, setState] = useState<string>("Waiting for camera...");
   const [qrData, setQrData] = useState<{
     originalUrl: string;
@@ -31,9 +35,19 @@ export function useQrScanner() {
   // Helper to create a cooldown between scans
   function pauseScanner() {
     isProcessing.current = true;
-    setTimeout(() => {
+
+    // Clear any existing timeout to prevent overlapping cooldowns
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
       isProcessing.current = false;
-      setState("Scanning...");
+
+      // Only update state if the component is still mounted
+      if (isMounted.current) {
+        setState("Scanning...");
+      }
     }, 1500);
   }
 
@@ -119,6 +133,12 @@ export function useQrScanner() {
         return;
       }
 
+      // Stop existing tracks before requesting a new stream
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+
       const isMobile =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
           navigator.userAgent,
@@ -161,7 +181,17 @@ export function useQrScanner() {
 
   // Clean up on unmount
   useEffect(() => {
+    isMounted.current = true;
+
     return () => {
+      // Mark as unmounted to block pending state updates
+      isMounted.current = false;
+
+      // Clear the scanner cooldown timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
 
       if (streamRef.current) {
