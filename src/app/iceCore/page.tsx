@@ -35,7 +35,11 @@ export default function IceCorePage() {
 
   const config = getAdjustedARConfig(baseConfigNft, IOS_OFFSETS);
 
-  const iframeSrc = `/nft-ar.html?${buildARQueryString(config)}`;
+  let iframeSrc = `/nft-ar.html?${buildARQueryString(config)}`;
+
+  if (process.env.NODE_ENV === "development") {
+    iframeSrc += `&debug=1`;
+  }
 
   // Listen for events from iframe
   useIframeMessage({

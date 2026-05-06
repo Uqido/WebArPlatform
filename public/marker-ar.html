@@ -13,9 +13,16 @@
     <script src="/ar-libs/aframe-extras.min.js"></script>
     <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>
-      eruda.init();
+      const erudaParams = new URLSearchParams(window.location.search);
+      if (erudaParams.get("debug") === "1") {
+        const erudaScript = document.createElement("script");
+        erudaScript.src = "https://cdn.jsdelivr.net/npm/eruda";
+        erudaScript.onload = function () {
+          eruda.init();
+        };
+        document.head.appendChild(erudaScript);
+      }
     </script>
 
     <script>
