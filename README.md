@@ -133,9 +133,18 @@ Here is an example of how the `postinstall` command looks:
 "postinstall": "shx mkdir -p public/ar-libs && shx cp -f \"node_modules/aframe/dist/*.js\" public/ar-libs/ && shx cp -f node_modules/@ar-js-org/ar.js/aframe/build/aframe-ar.js public/ar-libs/ && shx cp -f node_modules/aframe-extras/dist/aframe-extras.min.js public/ar-libs/"
 ```
 
+**Option C: Via CDN / External Link**
+You can also include a library directly from an external source (like a CDN or a hosted repository). You don't need to download or install anything; just add a `<script>` tag pointing to the URL directly inside your static HTML file.
+
 ### Step 2.2: Create a static HTML entry point
 
 Create a new HTML file in the `public/` directory (e.g., `public/my-custom-ar.html`). This file will host the A-Frame scene and your new library.
+
+### Step 2.3: Connect the HTML to Next.js
+
+In your Next.js page (created in Step 1), point the iframe `src` to your new HTML file.
+
+You can pass data into the iframe by converting your configuration object using the `buildARQueryString` helper. The `useIframeMessage` hook will automatically listen to the `window.parent.postMessage` calls you set up in Step 2.2, allowing your React UI to react to AR events (like showing a button only when the marker is found).
 
 # Export a Gltf from Unity
 
