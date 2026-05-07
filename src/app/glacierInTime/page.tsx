@@ -47,7 +47,10 @@ export default function GlacierInTimePage() {
 
   const config = getAdjustedARConfig(baseConfig, IOS_OFFSETS);
 
-  const iframeSrc = `/nft-ar.html?${buildARQueryString(config)}`;
+  let iframeSrc = `/nft-ar.html?${buildARQueryString(config)}`;
+  if (process.env.NODE_ENV === "development") {
+    iframeSrc += `&debug=1`;
+  }
 
   const markerImageUrl = "/models/glacier-in-time/Marker.jpg";
 
