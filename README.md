@@ -13,8 +13,7 @@
 First, build and run the application:
 
 ```bash
-npm run build
-npm run start
+npm run dev
 ```
 
 The app will be available locally at http://localhost:3000.
