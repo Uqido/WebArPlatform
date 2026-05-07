@@ -3,12 +3,15 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRef, useState } from "react";
+import { Manrope } from "next/font/google";
 import { ARConfig, AROffsets } from "@/types/ar";
 import {
   buildARQueryString,
   getAdjustedARConfig,
   useIframeMessage,
 } from "@/utils/arHelper";
+
+const manrope = Manrope({ subsets: ["latin"] });
 
 export default function IceCorePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -17,9 +20,9 @@ export default function IceCorePage() {
   const [isMarkerFound, setIsMarkerFound] = useState<boolean>(false);
   const [animationStarted, setAnimationStarted] = useState<boolean>(false);
 
-  const baseConfig: ARConfig = {
+  const baseConfigNft: ARConfig = {
     markerType: "nft",
-    markerUrl: "./nft/ice-core/ice-core-target",
+    markerUrl: "./nft/ice-core-marker/Carota_SingleMarker_LowRes_300dpi",
     modelUrl: "/models/ice-core/Wrapper.gltf",
     scale: [1.5, 1.5, 1.5],
     rotation: [80, 180, 0],
@@ -33,9 +36,13 @@ export default function IceCorePage() {
     z: 0,
   };
 
-  const config = getAdjustedARConfig(baseConfig, IOS_OFFSETS);
+  const config = getAdjustedARConfig(baseConfigNft, IOS_OFFSETS);
 
-  const iframeSrc = `/nft-ar.html?${buildARQueryString(config)}`;
+  let iframeSrc = `/nft-ar.html?${buildARQueryString(config)}`;
+
+  if (process.env.NODE_ENV === "development") {
+    iframeSrc += `&debug=1`;
+  }
 
   // Listen for events from iframe
   useIframeMessage({
@@ -65,6 +72,7 @@ export default function IceCorePage() {
 
   return (
     <div
+      className={manrope.className}
       style={{
         position: "relative",
         width: "100vw",
@@ -125,7 +133,6 @@ export default function IceCorePage() {
           justifyContent: "space-between",
           padding: "40px 20px",
           zIndex: 10,
-          fontFamily: "sans-serif",
           pointerEvents: "none",
           textAlign: "center",
           boxSizing: "border-box",

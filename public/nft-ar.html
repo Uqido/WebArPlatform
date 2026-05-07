@@ -8,6 +8,8 @@
     />
     <title>AR.js NFT Dynamic</title>
 
+    <link rel="stylesheet" href="/css/ar-styles.css" />
+
     <script src="/ar-libs/aframe-master.min.js"></script>
     <script src="/ar-libs/aframe-extras.min.js"></script>
     <script src="/ar-libs/aframe-ar-nft.js"></script>
@@ -16,7 +18,15 @@
     <!-- Enable console on smartphone-->
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>
-      eruda.init();
+      const erudaParams = new URLSearchParams(window.location.search);
+      if (erudaParams.get("debug") === "1") {
+        const erudaScript = document.createElement("script");
+        erudaScript.src = "https://cdn.jsdelivr.net/npm/eruda";
+        erudaScript.onload = function () {
+          eruda.init();
+        };
+        document.head.appendChild(erudaScript);
+      }
     </script>
 
     <script>
@@ -101,6 +111,7 @@
         margin: 0;
         overflow: hidden;
         background-color: transparent;
+        font-family: "Manrope", sans-serif;
       }
       .arjs-loader {
         height: 100%;
@@ -118,7 +129,7 @@
         text-align: center;
         color: white;
         font-size: 1.25em;
-        font-family: sans-serif;
+        font-family: "Manrope", sans-serif;
       }
     </style>
   </head>
@@ -138,9 +149,10 @@
       <a-nft
         id="nft-marker"
         smooth="true"
-        smoothCount="30"
-        smoothTolerance="0.2"
-        smoothThreshold="2"
+        smooth-count="14"
+        smooth-tolerance="1.5"
+        smooth-threshold="3"
+        min-confidence="0.8"
         raycaster="objects: .clickable"
         emitevents="true"
         cursor="fuse: false; rayOrigin: mouse;"
