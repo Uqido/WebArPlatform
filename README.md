@@ -1,3 +1,13 @@
+## Table of Contents
+- [Getting Started](#getting-started)
+- [WebArPlatform Project Guide](#webarplatform-project-guide)
+  - [General Description and Project Structure](#general-description-and-project-structure)
+- [Expanding the WebAR Platform](#expanding-the-webar-platform)
+  - [1. How to Create a New Page](#1-how-to-create-a-new-page)
+  - [2. How to add and use a new AR Library](#2-how-to-add-and-use-a-new-ar-library)
+- [Export a Gltf from Unity](#export-a-gltf-from-unity)
+- [Try it yourself](#try-it-yourself)
+
 # Getting Started
 
 First, build and run the application:
@@ -153,3 +163,19 @@ First we need the UnityGltf package. It can be added from the following github r
 Once done, to export a model, we have to right click on the game object, select **UnityGLTF** and **Export Selected**.
 
 To modify the export settings, for example to allow the animation export, we can select the **Open export Settings** option.
+
+
+## Try it yourself
+Scan the following QRs to reach the webAR platform. Once the camera is active, scan again the QR to go to the AR effect.
+
+<table>
+  <tr>
+    <td><img width="263" height="301" alt="IceCore" src="https://github.com/user-attachments/assets/59dd8354-544e-4125-a09e-2f9eece2172f" /></td>
+    <td><img width="300" alt="Carota" src="https://github.com/user-attachments/assets/eaef985b-6e57-43e1-9912-c4fa40170aa5" /></td>
+  </tr>
+  
+  <tr>
+    <td><img width="262" height="302" alt="Glacier in Time" src="https://github.com/user-attachments/assets/f79ce71a-20ba-478d-b3e6-fdee3642d582" /></td>
+    <td><img width="300" alt="Ieri e oggi" src="https://github.com/user-attachments/assets/20dbb24f-f2ca-4aa9-acc9-ec41a4462c42" /></td>
+  </tr>
+</table>
