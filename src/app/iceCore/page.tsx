@@ -3,12 +3,15 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRef, useState } from "react";
+import { Manrope } from "next/font/google";
 import { ARConfig, AROffsets } from "@/types/ar";
 import {
   buildARQueryString,
   getAdjustedARConfig,
   useIframeMessage,
 } from "@/utils/arHelper";
+
+const manrope = Manrope({ subsets: ["latin"] });
 
 export default function IceCorePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -69,6 +72,7 @@ export default function IceCorePage() {
 
   return (
     <div
+      className={manrope.className}
       style={{
         position: "relative",
         width: "100vw",
@@ -129,7 +133,6 @@ export default function IceCorePage() {
           justifyContent: "space-between",
           padding: "40px 20px",
           zIndex: 10,
-          fontFamily: "sans-serif",
           pointerEvents: "none",
           textAlign: "center",
           boxSizing: "border-box",
