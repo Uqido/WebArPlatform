@@ -1,4 +1,5 @@
 ## Table of Contents
+
 - [Getting Started](#getting-started)
 - [WebArPlatform Project Guide](#webarplatform-project-guide)
   - [General Description and Project Structure](#general-description-and-project-structure)
@@ -163,18 +164,20 @@ Once done, to export a model, we have to right click on the game object, select 
 
 To modify the export settings, for example to allow the animation export, we can select the **Open export Settings** option.
 
-
 ## Try it yourself
+
 Scan the following QRs to reach the webAR platform. Once the camera is active, scan again the QR to go to the AR effect.
 
 <table>
   <tr>
-    <td><img width="263" height="301" alt="IceCore" src="https://github.com/user-attachments/assets/59dd8354-544e-4125-a09e-2f9eece2172f" /></td>
+    <td><img width="260" height="299" alt="Ice Core" src="https://github.com/user-attachments/assets/011c2989-223b-414d-9752-02645df1deb3" />
+</td>
     <td><img width="300" alt="Carota" src="https://github.com/user-attachments/assets/eaef985b-6e57-43e1-9912-c4fa40170aa5" /></td>
   </tr>
   
   <tr>
-    <td><img width="262" height="302" alt="Glacier in Time" src="https://github.com/user-attachments/assets/f79ce71a-20ba-478d-b3e6-fdee3642d582" /></td>
+    <td><img width="262" height="301" alt="Glacier In Time" src="https://github.com/user-attachments/assets/ab6bacb5-a767-4ea1-9dc7-e725a261d82e" />
+</td>
     <td><img width="300" alt="Ieri e oggi" src="https://github.com/user-attachments/assets/20dbb24f-f2ca-4aa9-acc9-ec41a4462c42" /></td>
   </tr>
 </table>

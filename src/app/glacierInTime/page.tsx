@@ -10,6 +10,7 @@ import {
   getAdjustedARConfig,
   useIframeMessage,
 } from "@/utils/arHelper";
+import { BASE_PATH } from "@/utils/configHelper";
 
 import styles from "./glacierInTime.module.css";
 
@@ -29,8 +30,8 @@ const revealAnimation: CustomAnimation = {
 
 const baseConfig: ARConfig = {
   markerType: "nft",
-  markerUrl: "./nft/glacier-in-time/glacier-in-time-target",
-  modelUrl: "/models/glacier-in-time/Wrapper.gltf",
+  markerUrl: `${BASE_PATH}/nft/glacier-in-time/glacier-in-time-target`,
+  modelUrl: `${BASE_PATH}/models/glacier-in-time/Wrapper.gltf`,
   scale: [250, 250, 250],
   rotation: [0, 180, 0],
   position: [125, 0, -180],
@@ -44,7 +45,7 @@ const IOS_OFFSETS: AROffsets = {
   z: 0,
 };
 
-const markerImageUrl = "/models/glacier-in-time/Marker.jpg";
+const markerImageUrl = `${BASE_PATH}/models/glacier-in-time/Marker.jpg`;
 
 export default function GlacierInTimePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -55,7 +56,7 @@ export default function GlacierInTimePage() {
 
   const config = getAdjustedARConfig(baseConfig, IOS_OFFSETS);
 
-  let iframeSrc = `/nft-ar.html?${buildARQueryString(config)}`;
+  let iframeSrc = `${BASE_PATH}/nft-ar.html?${buildARQueryString(config)}`;
   if (process.env.NODE_ENV === "development") {
     iframeSrc += `&debug=1`;
   }
