@@ -8,11 +8,24 @@
     />
     <title>AR.js Demo</title>
 
+    <link rel="stylesheet" href="./css/ar-styles.css" />
+
     <script src="./ar-libs/aframe-master.min.js"></script>
     <script src="./ar-libs/aframe-ar.js"></script>
     <script src="./ar-libs/aframe-extras.min.js"></script>
-    <!-- npm package not available-->
     <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
+
+    <script>
+      const erudaParams = new URLSearchParams(window.location.search);
+      if (erudaParams.get("debug") === "1") {
+        const erudaScript = document.createElement("script");
+        erudaScript.src = "https://cdn.jsdelivr.net/npm/eruda";
+        erudaScript.onload = function () {
+          eruda.init();
+        };
+        document.head.appendChild(erudaScript);
+      }
+    </script>
 
     <script>
       const headParams = new URLSearchParams(window.location.search);
@@ -30,6 +43,7 @@
         margin: 0;
         overflow: hidden;
         background-color: transparent;
+        font-family: "Manrope", sans-serif;
       }
     </style>
   </head>
@@ -104,12 +118,6 @@
             "minScale: 0.1; maxScale: 10",
           );
         }
-
-        // Animation management
-        modelEntity.setAttribute(
-          "animation-mixer",
-          "clip: *; loop: repeat; crossFadeDuration: 0.3",
-        );
 
         modelEntity.setAttribute("gltf-model", modelUrl);
         modelEntity.setAttribute("position", position);
