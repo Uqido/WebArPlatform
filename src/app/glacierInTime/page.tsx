@@ -13,8 +13,38 @@ import {
 
 import styles from "./glacierInTime.module.css";
 
-// Inizializza il font
+// Font initialization
 const manrope = Manrope({ subsets: ["latin"] });
+
+// Reveal animation
+const revealAnimation: CustomAnimation = {
+  name: "reveal",
+  config: {
+    type: "clip-z",
+    duration: 6000,
+    min: -1500,
+    max: 0,
+  },
+};
+
+const baseConfig: ARConfig = {
+  markerType: "nft",
+  markerUrl: "./nft/glacier-in-time/glacier-in-time-target",
+  modelUrl: "/models/glacier-in-time/Wrapper.gltf",
+  scale: [250, 250, 250],
+  rotation: [0, 180, 0],
+  position: [125, 0, -180],
+  enableInteraction: false,
+  customAnimation: revealAnimation,
+};
+
+const IOS_OFFSETS: AROffsets = {
+  x: -40,
+  y: 0,
+  z: 0,
+};
+
+const markerImageUrl = "/models/glacier-in-time/Marker.jpg";
 
 export default function GlacierInTimePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -23,42 +53,12 @@ export default function GlacierInTimePage() {
   const [isMarkerFound, setIsMarkerFound] = useState<boolean>(false);
   const [animationStarted, setAnimationStarted] = useState<boolean>(false);
 
-  // Reveal animation
-  const revealAnimation: CustomAnimation = {
-    name: "reveal",
-    config: {
-      type: "clip-z",
-      duration: 6000,
-      min: -1500,
-      max: 0,
-    },
-  };
-
-  const baseConfig: ARConfig = {
-    markerType: "nft",
-    markerUrl: "./nft/glacier-in-time/glacier-in-time-target",
-    modelUrl: "/models/glacier-in-time/Wrapper.gltf",
-    scale: [250, 250, 250],
-    rotation: [0, 180, 0],
-    position: [125, 0, -180],
-    enableInteraction: false,
-    customAnimation: revealAnimation,
-  };
-
-  const IOS_OFFSETS: AROffsets = {
-    x: -40,
-    y: 0,
-    z: 0,
-  };
-
   const config = getAdjustedARConfig(baseConfig, IOS_OFFSETS);
 
   let iframeSrc = `/nft-ar.html?${buildARQueryString(config)}`;
   if (process.env.NODE_ENV === "development") {
     iframeSrc += `&debug=1`;
   }
-
-  const markerImageUrl = "/models/glacier-in-time/Marker.jpg";
 
   // Listen for events from iframe
   useIframeMessage({

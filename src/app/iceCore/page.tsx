@@ -14,28 +14,27 @@ import styles from "./iceCore.module.css";
 
 const manrope = Manrope({ subsets: ["latin"] });
 
+const baseConfigNft: ARConfig = {
+  markerType: "nft",
+  markerUrl: "./nft/ice-core-marker/Carota_SingleMarker_LowRes_300dpi",
+  modelUrl: "/models/ice-core/Wrapper.gltf",
+  scale: [1.5, 1.5, 1.5],
+  rotation: [80, 180, 0],
+  position: [135, 0, -125],
+  enableInteraction: true,
+};
+
+const IOS_OFFSETS: AROffsets = {
+  x: -40,
+  y: 0,
+  z: 0,
+};
 export default function IceCorePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [animations, setAnimations] = useState<string[]>([]);
   const [, setActiveAnim] = useState<string | null>(null);
   const [isMarkerFound, setIsMarkerFound] = useState<boolean>(false);
   const [animationStarted, setAnimationStarted] = useState<boolean>(false);
-
-  const baseConfigNft: ARConfig = {
-    markerType: "nft",
-    markerUrl: "./nft/ice-core-marker/Carota_SingleMarker_LowRes_300dpi",
-    modelUrl: "/models/ice-core/Wrapper.gltf",
-    scale: [1.5, 1.5, 1.5],
-    rotation: [80, 180, 0],
-    position: [135, 0, -125],
-    enableInteraction: true,
-  };
-
-  const IOS_OFFSETS: AROffsets = {
-    x: -40,
-    y: 0,
-    z: 0,
-  };
 
   const config = getAdjustedARConfig(baseConfigNft, IOS_OFFSETS);
 
