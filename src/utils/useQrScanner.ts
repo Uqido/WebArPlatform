@@ -3,14 +3,7 @@ import { useRouter } from "next/navigation";
 import jsQR from "jsqr";
 
 // Define authorized IDs here
-const ALLOWED_IDS = [
-  "demo1",
-  "demoTrex",
-  "demoModelViewer",
-  "demoParticle",
-  "iceCore",
-  "glacierInTime",
-];
+const ALLOWED_IDS = ["demoModelViewer", "iceCore", "glacierInTime"];
 
 export function useQrScanner() {
   const router = useRouter();
