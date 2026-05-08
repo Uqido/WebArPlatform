@@ -1,6 +1,7 @@
 ## Table of Contents
 
 - [Getting Started](#getting-started)
+- [Deploy](#deploy)
 - [WebArPlatform Project Guide](#webarplatform-project-guide)
   - [General Description and Project Structure](#general-description-and-project-structure)
 - [Expanding the WebAR Platform](#expanding-the-webar-platform)
@@ -29,6 +30,18 @@ Once executed, Cloudflare will generate a public URL in the terminal, for exampl
 https://some-random-words.trycloudflare.com
 
 To test the application on other devices, simply open the generated link on your smartphone
+
+## Deploy 
+To deploy the application run the following command in the `main` branch:
+
+```bash
+npm run deploy
+```
+What the script does:
+- Build the application
+- Generates a static export of the project.
+- Copies the exported files to the gh-pages branch.
+- Pushes the updates to GitHub, which automatically triggers the deployment process.
 
 # WebArPlatform Project Guide
 
