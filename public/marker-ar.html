@@ -15,6 +15,12 @@
     <script src="./ar-libs/aframe-extras.min.js"></script>
     <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
 
+    <!-- Enable console on smartphone-->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+      eruda.init();
+    </script>
+
     <script>
       const erudaParams = new URLSearchParams(window.location.search);
       if (erudaParams.get("debug") === "1") {

@@ -12,9 +12,11 @@
 
     <script src="./ar-libs/aframe-master.min.js"></script>
     <script src="./ar-libs/aframe-extras.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <script src="./ar-libs/aframe-ar-nft.js"></script>
     <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
 
+    <!-- Enable console on smartphone-->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>
       const erudaParams = new URLSearchParams(window.location.search);
       if (erudaParams.get("debug") === "1") {
@@ -27,6 +29,16 @@
       }
     </script>
 
+    <script>
+      const headParams = new URLSearchParams(window.location.search);
+      const effectToLoad = headParams.get("particleEffectName");
+
+      if (effectToLoad) {
+        document.write(
+          `<script src="/particles/${effectToLoad}.js"><\/script>`,
+        );
+      }
+    </script>
     <script>
       AFRAME.registerComponent("print-reveal", {
         schema: {
@@ -162,9 +174,13 @@
         const rotation = urlParams.get("rotation") || "0 0 0";
         const position = urlParams.get("position") || "0 0 0";
 
+        // Particles
+        const particleEffectName = urlParams.get("particleEffectName");
+
         // Animation config
         const customAnimationParam = urlParams.get("customAnimation");
 
+        const scene = document.querySelector("a-scene");
         const marker = document.querySelector("#nft-marker");
         const modelEntity = document.querySelector("#ar-model");
 
@@ -223,6 +239,25 @@
               "*",
             );
           });
+
+          // Particles management
+          if (particleEffectName) {
+            function addParticles() {
+              const particleEntity = document.createElement("a-entity");
+              particleEntity.setAttribute("id", "particle-system");
+              particleEntity.setAttribute(particleEffectName, "");
+              particleEntity.setAttribute("position", "0 0 0");
+
+              // add aprticles to marker
+              marker.appendChild(particleEntity);
+            }
+
+            if (scene.hasLoaded) {
+              addParticles();
+            } else {
+              scene.addEventListener("loaded", addParticles);
+            }
+          }
         }
 
         if (modelEntity) {

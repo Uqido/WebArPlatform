@@ -28,7 +28,7 @@ export default function IceCorePage() {
     scale: [1.5, 1.5, 1.5],
     rotation: [80, 180, 0],
     position: [135, 0, -125],
-    enableInteraction: true,
+    enableInteraction: false,
   };
 
   const IOS_OFFSETS: AROffsets = {
