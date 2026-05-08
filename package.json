@@ -1,7 +1,7 @@
 {
   "name": "web-ar-platform",
   "version": "0.1.0",
-  "homepage": "https://uqido.github.io/WebArPlatform_Public",
+  "homepage": "https://uqido.github.io/WebArPlatform/",
   "private": true,
   "scripts": {
     "dev": "next dev",

@@ -2,7 +2,7 @@
 
 // Check build for production
 const isProd = process.env.NODE_ENV === "production";
-const prefix = isProd ? "/WebArPlatform_Public" : "";
+const prefix = isProd ? "/WebArPlatform" : "";
 
 const nextConfig = {
   output: "export",
