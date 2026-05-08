@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "shx mkdir -p public/ar-libs && shx cp -f \"node_modules/aframe/dist/*.js\" public/ar-libs/ && shx cp -f node_modules/@ar-js-org/ar.js/aframe/build/aframe-ar.js public/ar-libs/ && shx cp -f node_modules/aframe-extras/dist/aframe-extras.min.js public/ar-libs/"
+    "postinstall": "shx mkdir -p public/ar-libs && shx cp -f \"node_modules/aframe/dist/*.js\" public/ar-libs/ && shx cp -f node_modules/@ar-js-org/ar.js/aframe/build/aframe-ar.js public/ar-libs/ && shx cp -f node_modules/@ar-js-org/ar.js/aframe/build/aframe-ar-nft.js public/ar-libs/ && shx cp -f node_modules/aframe-extras/dist/aframe-extras.min.js public/ar-libs/ "
   },
   "dependencies": {
     "@ar-js-org/ar.js": "^3.4.8",
