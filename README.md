@@ -179,7 +179,3 @@ Scan the following QRs to reach the webAR platform. Once the camera is active, s
     <td><img width="300" alt="Ieri e oggi" src="https://github.com/user-attachments/assets/20dbb24f-f2ca-4aa9-acc9-ec41a4462c42" /></td>
   </tr>
 </table>
-
-# Synch Public Repo
-
-To synch public repo, run the Workflow.
