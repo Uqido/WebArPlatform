@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Manrope } from "next/font/google";
-import styles from "./scanner.module.css";
+import styles from "./style.module.css";
 import { useQrScanner } from "../utils/useQrScanner";
 
 // Manrope font configuration
@@ -30,46 +30,12 @@ export default function Page() {
   // If is not scanning, show the landing page.
   if (!isScanning) {
     return (
-      <div
-        className={manrope.className}
-        style={{
-          backgroundColor: "#ffffff",
-          color: "#000000",
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "20px",
-          textAlign: "center",
-        }}
-      >
-        <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-          Piattaforma WebAR di Uqido
-        </h1>
-        <p
-          style={{
-            fontSize: "1.1rem",
-            marginBottom: "2rem",
-            maxWidth: "400px",
-          }}
-        >
+      <div className={`${styles.landingContainer} ${manrope.className}`}>
+        <h1 className={styles.landingTitle}>Piattaforma WebAR di Uqido</h1>
+        <p className={styles.landingText}>
           Premi il pulsante e inquadra il QR code per accedere ai contenuti AR
         </p>
-        <button
-          onClick={handleStartCamera}
-          style={{
-            backgroundColor: "#000000",
-            color: "#ffffff",
-            border: "none",
-            borderRadius: "8px",
-            padding: "14px 28px",
-            fontSize: "1rem",
-            fontWeight: "bold",
-            cursor: "pointer",
-            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-          }}
-        >
+        <button onClick={handleStartCamera} className={styles.button}>
           Attiva la camera
         </button>
       </div>
@@ -87,21 +53,13 @@ export default function Page() {
       />
 
       <div className={styles.overlay}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
+        <div className={styles.statusWrapper}>
           <span
-            className={`${styles.statusBadge} ${
-              qrData ? styles.statusSuccess : ""
-            }`}
-            style={
-              isError ? { backgroundColor: "#dc2626", color: "white" } : {}
-            }
+            className={`
+              ${styles.statusBadge} 
+              ${qrData ? styles.statusSuccess : ""} 
+              ${isError ? styles.statusError : ""}
+            `.trim()}
           >
             {message}
           </span>
@@ -110,17 +68,7 @@ export default function Page() {
           {isError && (
             <button
               onClick={() => window.location.reload()}
-              style={{
-                backgroundColor: "#ffffff",
-                color: "#000000",
-                border: "none",
-                borderRadius: "8px",
-                padding: "8px 16px",
-                fontSize: "0.9rem",
-                fontWeight: "bold",
-                cursor: "pointer",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-              }}
+              className={styles.retryButton}
             >
               Go Back / Retry
             </button>
@@ -129,30 +77,18 @@ export default function Page() {
 
         {qrData && (
           <div className={styles.resultBox}>
-            <h3 style={{ color: "#0f0" }}>✓ Read correctly!</h3>
-            <p style={{ color: "#aaa", fontSize: "12px" }}>
-              Automatic reset in 2 seconds...
-            </p>
-            <p
-              style={{
-                color: "#aaa",
-                fontSize: "14px",
-                wordBreak: "break-all",
-              }}
-            >
+            <h3 className={styles.resultSuccessTitle}>✓ Read correctly!</h3>
+            <p className={styles.resultHint}>Automatic reset in 2 seconds...</p>
+            <p className={styles.resultUrl}>
               <strong>URL:</strong> {qrData.originalUrl}
             </p>
 
-            <div style={{ marginBottom: "20px" }}>
-              <strong style={{ color: "#fff" }}>Parameters found:</strong>
+            <div className={styles.resultParamsContainer}>
+              <strong className={styles.resultParamsTitle}>
+                Parameters found:
+              </strong>
               {Object.keys(qrData.parameters).length > 0 ? (
-                <ul
-                  style={{
-                    color: "#0f0",
-                    margin: "10px 0 0 0",
-                    paddingLeft: "20px",
-                  }}
-                >
+                <ul className={styles.resultParamsList}>
                   {Object.entries(qrData.parameters).map(([key, value]) => (
                     <li key={key}>
                       <b>{key}</b>: {value}
@@ -160,9 +96,7 @@ export default function Page() {
                   ))}
                 </ul>
               ) : (
-                <p style={{ color: "#aaa", fontSize: "14px" }}>
-                  No parameter founded.
-                </p>
+                <p className={styles.resultHint}>No parameter founded.</p>
               )}
             </div>
           </div>

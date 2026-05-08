@@ -10,6 +10,7 @@ import {
   getAdjustedARConfig,
   useIframeMessage,
 } from "@/utils/arHelper";
+import styles from "./iceCore.module.css";
 
 const manrope = Manrope({ subsets: ["latin"] });
 
@@ -71,130 +72,37 @@ export default function IceCorePage() {
   };
 
   return (
-    <div
-      className={manrope.className}
-      style={{
-        position: "relative",
-        width: "100vw",
-        height: "100dvh",
-        overflow: "hidden",
-        backgroundColor: "#000",
-      }}
-    >
+    <div className={`${styles.container} ${manrope.className}`}>
       {/* Invisible overlay to capture the click*/}
       {isMarkerFound && !animationStarted && (
-        <div
-          onClick={handleScreenTouch}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            zIndex: 8,
-            cursor: "pointer",
-          }}
-        />
+        <div onClick={handleScreenTouch} className={styles.clickOverlay} />
       )}
 
-      {/* Overlay image */}
+      {/* Overlay image - L'opacità rimane inline perché dinamica */}
       <Image
         src="/models/ice-core/Marker.jpg"
         alt="Inquadra questa immagine"
         width={512}
         height={1024}
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          maxWidth: "80vw",
-          maxHeight: "80vh",
-          width: "auto",
-          height: "auto",
-          opacity: isMarkerFound ? 0 : 0.4,
-          transition: "opacity 0.6s ease-in-out",
-          pointerEvents: "none",
-          zIndex: 5,
-        }}
+        className={styles.markerImage}
+        style={{ opacity: isMarkerFound ? 0 : 0.4 }}
         priority
       />
 
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "40px 20px",
-          zIndex: 10,
-          pointerEvents: "none",
-          textAlign: "center",
-          boxSizing: "border-box",
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <div className={styles.uiContainer}>
+        <div className={styles.textGroup}>
           {!isMarkerFound && (
-            <p
-              style={{
-                fontSize: "1.2rem",
-                color: "#fff",
-                textShadow: "1px 1px 3px rgba(0,0,0,0.8)",
-                margin: 0,
-              }}
-            >
-              Frame the image to start
-            </p>
+            <p className={styles.instructionText}>Frame the image to start</p>
           )}
 
           {isMarkerFound && !animationStarted && (
-            <div
-              style={{
-                fontSize: "1.5rem",
-                color: "#fff",
-                fontWeight: "bold",
-                animation: "pulse 2s infinite",
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-                textShadow: "2px 2px 6px rgba(0,0,0,0.9)",
-                pointerEvents: "none",
-              }}
-            >
-              Tocca per iniziare
-            </div>
+            <div className={styles.pulseText}>Tocca per iniziare</div>
           )}
         </div>
 
         {/* Go back button */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "20px",
-            marginBottom: "20px",
-          }}
-        >
-          <Link
-            href="/"
-            style={{
-              pointerEvents: "auto",
-              display: "inline-block",
-              padding: "12px 24px",
-              backgroundColor: "#0070f3",
-              color: "white",
-              textDecoration: "none",
-              borderRadius: "8px",
-              fontSize: "16px",
-              fontWeight: "bold",
-              opacity: 0.8,
-            }}
-          >
+        <div className={styles.bottomGroup}>
+          <Link href="/" className={styles.backButton}>
             ← Back to the scanner
           </Link>
         </div>
@@ -203,36 +111,10 @@ export default function IceCorePage() {
       <iframe
         ref={iframeRef}
         src={iframeSrc}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          border: "none",
-          zIndex: 1,
-        }}
+        className={styles.iframeStyle}
         allow="camera; gyroscope; accelerometer; magnetometer; vr;"
         title="AR Scanner"
       />
-
-      {/* Pulse effect */}
-      <style jsx>{`
-        @keyframes pulse {
-          0% {
-            transform: scale(1);
-            opacity: 0.8;
-          }
-          50% {
-            transform: scale(1.05);
-            opacity: 1;
-          }
-          100% {
-            transform: scale(1);
-            opacity: 0.8;
-          }
-        }
-      `}</style>
     </div>
   );
 }
