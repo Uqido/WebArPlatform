@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import jsQR from "jsqr";
 import { ALLOWED_IDS } from "../../public/config/experiences";
 
+export type ScannerStatus = "idle" | "scanning" | "success" | "error";
 
 export function useQrScanner() {
   const router = useRouter();
@@ -18,7 +19,9 @@ export function useQrScanner() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isMounted = useRef<boolean>(true);
 
-  const [state, setState] = useState<string>("Waiting for camera...");
+  const [status, setStatus] = useState<ScannerStatus>("idle");
+  const [message, setMessage] = useState<string>("Waiting for camera...");
+
   const [qrData, setQrData] = useState<{
     originalUrl: string;
     parameters: Record<string, string>;
@@ -38,7 +41,8 @@ export function useQrScanner() {
 
       // Only update state if the component is still mounted
       if (isMounted.current) {
-        setState("Scanning...");
+        setStatus("scanning");
+        setMessage("Scanning...");
       }
     }, 1500);
   }
@@ -54,15 +58,16 @@ export function useQrScanner() {
         // Validate the ID against the whitelist
         if (ALLOWED_IDS.includes(id)) {
           isProcessing.current = true;
-          setState(`ID "${id}" verified! Redirecting...`);
-
+          setStatus("success");
+          setMessage(`ID "${id}" verified! Redirecting...`);
           // Stop animation before navigating
           if (requestRef.current) cancelAnimationFrame(requestRef.current);
           router.push(`/${id}`);
           return;
         } else {
           // ID found but not authorized
-          setState(`Access Denied: ID "${id}" is not valid.`);
+          setStatus("error");
+          setMessage(`Access Denied: ID "${id}" is not valid.`);
           setQrData({ originalUrl: qrString, parameters });
 
           // Briefly pause to show the error before allowing next scan
@@ -71,11 +76,13 @@ export function useQrScanner() {
         }
       }
 
-      setState("QR detected but no ID parameter found.");
+      setStatus("error");
+      setMessage("QR detected but no ID parameter found.");
       setQrData({ originalUrl: qrString, parameters });
       pauseScanner();
     } catch (err) {
-      setState("QR does not contain a valid URL.");
+      setStatus("error");
+      setMessage("QR does not contain a valid URL.");
       setQrData({ originalUrl: qrString, parameters: {} });
       pauseScanner();
     }
@@ -121,7 +128,10 @@ export function useQrScanner() {
   async function startCamera() {
     try {
       if (!navigator.mediaDevices?.getUserMedia) {
-        setState("Camera API blocked or not supported. Check HTTPS/localhost.");
+        setStatus("error");
+        setMessage(
+          "Camera API blocked or not supported. Check HTTPS/localhost.",
+        );
         return;
       }
 
@@ -151,21 +161,23 @@ export function useQrScanner() {
         videoRef.current.setAttribute("playsinline", "true");
         await videoRef.current.play();
 
-        setState("Scanning...");
+        setStatus("scanning");
+        setMessage("Scanning...");
         requestRef.current = requestAnimationFrame(scanFrame);
       }
     } catch (err) {
+      setStatus("error");
       if (err instanceof DOMException && err.name === "NotFoundError") {
-        setState("Error: No camera found on this device.");
+        setMessage("Error: No camera found on this device.");
       } else if (
         err instanceof DOMException &&
         err.name === "NotAllowedError"
       ) {
-        setState(
+        setMessage(
           "Error: Camera permission denied. Please allow camera access.",
         );
       } else if (err instanceof Error) {
-        setState(`Camera error: ${err.message}`);
+        setMessage(`Camera error: ${err.message}`);
       }
       console.error("getUserMedia error:", err);
     }
@@ -195,5 +207,5 @@ export function useQrScanner() {
   }, []);
 
   // Expose startCamera to the component
-  return { videoRef, state, qrData, startCamera };
+  return { videoRef, status, message, qrData, startCamera };
 }

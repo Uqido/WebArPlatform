@@ -9,7 +9,7 @@ import { useQrScanner } from "../utils/useQrScanner";
 const manrope = Manrope({ subsets: ["latin"] });
 
 export default function Page() {
-  const { videoRef, state, qrData, startCamera } = useQrScanner();
+  const { videoRef, status, message, qrData, startCamera } = useQrScanner();
   const [isScanning, setIsScanning] = useState(false);
 
   // 1. Trigger startCamera ONLY after the DOM has updated and the video is mounted
@@ -19,17 +19,13 @@ export default function Page() {
     }
     // We intentionally omit startCamera from the dependency array to avoid
     // infinite loops if the hook doesn't heavily memoize the function.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isScanning]);
 
   const handleStartCamera = () => {
     setIsScanning(true);
   };
 
-  // 2. Helper to determine if the camera failed to initialize
-  const isError =
-    state.toLowerCase().includes("error") ||
-    state.toLowerCase().includes("blocked");
+  const isError = status === "error";
 
   // If is not scanning, show the landing page.
   if (!isScanning) {
@@ -103,12 +99,11 @@ export default function Page() {
             className={`${styles.statusBadge} ${
               qrData ? styles.statusSuccess : ""
             }`}
-            // Add some inline styling to highlight errors in red
             style={
               isError ? { backgroundColor: "#dc2626", color: "white" } : {}
             }
           >
-            {state}
+            {message}
           </span>
 
           {/* Render a Retry/Back button if the camera fails */}
