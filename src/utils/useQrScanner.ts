@@ -1,16 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import jsQR from "jsqr";
+import { ALLOWED_IDS } from "../../public/config/experiences";
 
-// Define authorized IDs here
-const ALLOWED_IDS = [
-  "demo1",
-  "demoTrex",
-  "demoModelViewer",
-  "demoParticle",
-  "iceCore",
-  "glacierInTime",
-];
 
 export function useQrScanner() {
   const router = useRouter();
