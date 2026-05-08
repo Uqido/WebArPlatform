@@ -3,12 +3,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRef, useState } from "react";
+import { Manrope } from "next/font/google";
 import { ARConfig, AROffsets, CustomAnimation } from "@/types/ar";
 import {
   buildARQueryString,
   getAdjustedARConfig,
   useIframeMessage,
 } from "@/utils/arHelper";
+
+// Inizializza il font
+const manrope = Manrope({ subsets: ["latin"] });
 
 export default function GlacierInTimePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -17,7 +21,7 @@ export default function GlacierInTimePage() {
   const [isMarkerFound, setIsMarkerFound] = useState<boolean>(false);
   const [animationStarted, setAnimationStarted] = useState<boolean>(false);
 
-  // 1. Reveal animation
+  // Reveal animation
   const revealAnimation: CustomAnimation = {
     name: "reveal",
     config: {
@@ -47,7 +51,10 @@ export default function GlacierInTimePage() {
 
   const config = getAdjustedARConfig(baseConfig, IOS_OFFSETS);
 
-  const iframeSrc = `/nft-ar.html?${buildARQueryString(config)}`;
+  let iframeSrc = `/nft-ar.html?${buildARQueryString(config)}`;
+  if (process.env.NODE_ENV === "development") {
+    iframeSrc += `&debug=1`;
+  }
 
   const markerImageUrl = "/models/glacier-in-time/Marker.jpg";
 
@@ -80,6 +87,7 @@ export default function GlacierInTimePage() {
 
   return (
     <div
+      className={manrope.className}
       style={{
         position: "relative",
         width: "100vw",
@@ -140,7 +148,6 @@ export default function GlacierInTimePage() {
           justifyContent: "space-between",
           padding: "40px 20px",
           zIndex: 10,
-          fontFamily: "sans-serif",
           pointerEvents: "none",
           textAlign: "center",
           boxSizing: "border-box",
