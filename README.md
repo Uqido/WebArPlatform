@@ -1,4 +1,5 @@
 ## Table of Contents
+
 - [Getting Started](#getting-started)
 - [WebArPlatform Project Guide](#webarplatform-project-guide)
   - [General Description and Project Structure](#general-description-and-project-structure)
@@ -163,8 +164,8 @@ Once done, to export a model, we have to right click on the game object, select 
 
 To modify the export settings, for example to allow the animation export, we can select the **Open export Settings** option.
 
-
 ## Try it yourself
+
 Scan the following QRs to reach the webAR platform. Once the camera is active, scan again the QR to go to the AR effect.
 
 <table>
@@ -178,3 +179,7 @@ Scan the following QRs to reach the webAR platform. Once the camera is active, s
     <td><img width="300" alt="Ieri e oggi" src="https://github.com/user-attachments/assets/20dbb24f-f2ca-4aa9-acc9-ec41a4462c42" /></td>
   </tr>
 </table>
+
+# Synch Public Repo
+
+To synch public repo, run the Workflow.
