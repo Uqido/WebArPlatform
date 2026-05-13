@@ -75,6 +75,13 @@ export default function Page() {
           )}
         </div>
 
+        {!qrData && !isError && (
+          <div className={styles.scannerGuide}>
+            <div className={styles.scannerFrame}></div>
+            <p className={styles.scannerText}>Inquadra il QR code al centro</p>
+          </div>
+        )}
+
         {qrData && (
           <div className={styles.resultBox}>
             <h3 className={styles.resultSuccessTitle}>
