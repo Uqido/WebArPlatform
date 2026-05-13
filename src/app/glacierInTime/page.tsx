@@ -10,10 +10,42 @@ import {
   getAdjustedARConfig,
   useIframeMessage,
 } from "@/utils/arHelper";
-
-// Inizializza il font
-const manrope = Manrope({ subsets: ["latin"] });
 import { BASE_PATH } from "@/utils/configHelper";
+
+import styles from "./glacierInTime.module.css";
+
+// Font initialization
+const manrope = Manrope({ subsets: ["latin"] });
+
+// Reveal animation
+const revealAnimation: CustomAnimation = {
+  name: "reveal",
+  config: {
+    type: "clip-z",
+    duration: 6000,
+    min: -1500,
+    max: 0,
+  },
+};
+
+const baseConfig: ARConfig = {
+  markerType: "nft",
+  markerUrl: `${BASE_PATH}/nft/glacier-in-time/glacier-in-time-target`,
+  modelUrl: `${BASE_PATH}/models/glacier-in-time/Wrapper.gltf`,
+  scale: [250, 250, 250],
+  rotation: [0, 180, 0],
+  position: [125, 0, -180],
+  enableInteraction: false,
+  customAnimation: revealAnimation,
+};
+
+const IOS_OFFSETS: AROffsets = {
+  x: -40,
+  y: 0,
+  z: 0,
+};
+
+const markerImageUrl = `${BASE_PATH}/models/glacier-in-time/Marker.jpg`;
 
 export default function GlacierInTimePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -22,42 +54,12 @@ export default function GlacierInTimePage() {
   const [isMarkerFound, setIsMarkerFound] = useState<boolean>(false);
   const [animationStarted, setAnimationStarted] = useState<boolean>(false);
 
-  // Reveal animation
-  const revealAnimation: CustomAnimation = {
-    name: "reveal",
-    config: {
-      type: "clip-z",
-      duration: 6000,
-      min: -1500,
-      max: 0,
-    },
-  };
-
-  const baseConfig: ARConfig = {
-    markerType: "nft",
-    markerUrl: `${BASE_PATH}/nft/glacier-in-time/glacier-in-time-target`,
-    modelUrl: `${BASE_PATH}/models/glacier-in-time/Wrapper.gltf`,
-    scale: [250, 250, 250],
-    rotation: [0, 180, 0],
-    position: [125, 0, -180],
-    enableInteraction: false,
-    customAnimation: revealAnimation,
-  };
-
-  const IOS_OFFSETS: AROffsets = {
-    x: -40,
-    y: 0,
-    z: 0,
-  };
-
   const config = getAdjustedARConfig(baseConfig, IOS_OFFSETS);
 
   let iframeSrc = `${BASE_PATH}/nft-ar.html?${buildARQueryString(config)}`;
   if (process.env.NODE_ENV === "development") {
     iframeSrc += `&debug=1`;
   }
-
-  const markerImageUrl = `${BASE_PATH}/models/glacier-in-time/Marker.jpg`;
 
   // Listen for events from iframe
   useIframeMessage({
@@ -87,30 +89,10 @@ export default function GlacierInTimePage() {
   };
 
   return (
-    <div
-      className={manrope.className}
-      style={{
-        position: "relative",
-        width: "100vw",
-        height: "100dvh",
-        overflow: "hidden",
-        backgroundColor: "#000",
-      }}
-    >
+    <div className={`${styles.container} ${manrope.className}`}>
       {/* Invisible overlay to capture the click*/}
       {isMarkerFound && !animationStarted && (
-        <div
-          onClick={handleScreenTouch}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            zIndex: 8,
-            cursor: "pointer",
-          }}
-        />
+        <div onClick={handleScreenTouch} className={styles.clickOverlay} />
       )}
 
       {/* Overlay image */}
@@ -119,99 +101,28 @@ export default function GlacierInTimePage() {
         alt="Inquadra questa immagine"
         width={512}
         height={1024}
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          maxWidth: "80vw",
-          maxHeight: "80vh",
-          width: "auto",
-          height: "auto",
-          opacity: isMarkerFound ? 0 : 0.4,
-          transition: "opacity 0.6s ease-in-out",
-          pointerEvents: "none",
-          zIndex: 5,
-        }}
+        className={styles.markerImage}
+        style={{ opacity: isMarkerFound ? 0 : 0.4 }}
         priority
       />
 
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "40px 20px",
-          zIndex: 10,
-          pointerEvents: "none",
-          textAlign: "center",
-          boxSizing: "border-box",
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <div className={styles.uiContainer}>
+        <div className={styles.textGroup}>
           {!isMarkerFound && (
-            <p
-              style={{
-                fontSize: "1.2rem",
-                color: "#fff",
-                textShadow: "1px 1px 3px rgba(0,0,0,0.8)",
-                margin: 0,
-              }}
-            >
-              Frame the image to start
+            <p className={styles.instructionText}>
+              Inquadra l`immagine per iniziare
             </p>
           )}
 
           {isMarkerFound && !animationStarted && (
-            <div
-              style={{
-                fontSize: "1.5rem",
-                color: "#fff",
-                fontWeight: "bold",
-                animation: "pulse 2s infinite",
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-                textShadow: "2px 2px 6px rgba(0,0,0,0.9)",
-                pointerEvents: "none",
-              }}
-            >
-              Tocca per iniziare
-            </div>
+            <div className={styles.pulseText}>Tocca per iniziare</div>
           )}
         </div>
 
         {/* Go back button */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "20px",
-            marginBottom: "20px",
-          }}
-        >
-          <Link
-            href="/"
-            style={{
-              pointerEvents: "auto",
-              display: "inline-block",
-              padding: "12px 24px",
-              backgroundColor: "#0070f3",
-              color: "white",
-              textDecoration: "none",
-              borderRadius: "8px",
-              fontSize: "16px",
-              fontWeight: "bold",
-              opacity: 0.8,
-            }}
-          >
-            ← Back to the scanner
+        <div className={styles.bottomGroup}>
+          <Link href="/" className={styles.backButton}>
+            ← Torna allo scanner
           </Link>
         </div>
       </div>
@@ -219,36 +130,10 @@ export default function GlacierInTimePage() {
       <iframe
         ref={iframeRef}
         src={iframeSrc}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          border: "none",
-          zIndex: 1,
-        }}
+        className={styles.iframeStyle}
         allow="camera; gyroscope; accelerometer; magnetometer; vr;"
         title="AR Scanner"
       />
-
-      {/* Pulse effect */}
-      <style jsx>{`
-        @keyframes pulse {
-          0% {
-            transform: scale(1);
-            opacity: 0.8;
-          }
-          50% {
-            transform: scale(1.05);
-            opacity: 1;
-          }
-          100% {
-            transform: scale(1);
-            opacity: 0.8;
-          }
-        }
-      `}</style>
     </div>
   );
 }
