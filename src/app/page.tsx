@@ -70,22 +70,26 @@ export default function Page() {
               onClick={() => window.location.reload()}
               className={styles.retryButton}
             >
-              Go Back / Retry
+              Indietro
             </button>
           )}
         </div>
 
         {qrData && (
           <div className={styles.resultBox}>
-            <h3 className={styles.resultSuccessTitle}>✓ Read correctly!</h3>
-            <p className={styles.resultHint}>Automatic reset in 2 seconds...</p>
+            <h3 className={styles.resultSuccessTitle}>
+              ✓ Letto correttamente!
+            </h3>
+            <p className={styles.resultHint}>
+              Reset in automatico in 2 secondi...
+            </p>
             <p className={styles.resultUrl}>
               <strong>URL:</strong> {qrData.originalUrl}
             </p>
 
             <div className={styles.resultParamsContainer}>
               <strong className={styles.resultParamsTitle}>
-                Parameters found:
+                Parametri trovati:
               </strong>
               {Object.keys(qrData.parameters).length > 0 ? (
                 <ul className={styles.resultParamsList}>
@@ -96,7 +100,7 @@ export default function Page() {
                   ))}
                 </ul>
               ) : (
-                <p className={styles.resultHint}>No parameter founded.</p>
+                <p className={styles.resultHint}>Parametri non trovati</p>
               )}
             </div>
           </div>

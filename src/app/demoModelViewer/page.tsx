@@ -9,12 +9,12 @@ export default function Home() {
   return (
     <main className={`${styles.mainContainer} ${manrope.className}`}>
       <p className={styles.instructionText}>
-        Interact with the object to rotate it
+        Interagisici con l`oggetto per ruotarlo
       </p>
 
       <div className={styles.buttonWrapper}>
         <Link href="/" className={styles.backButton}>
-          ← Back to the scanner
+          ← Torna allo scanner
         </Link>
       </div>
 

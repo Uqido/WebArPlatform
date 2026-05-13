@@ -81,7 +81,7 @@ export default function IceCorePage() {
         <div onClick={handleScreenTouch} className={styles.clickOverlay} />
       )}
 
-      {/* Overlay image - L'opacità rimane inline perché dinamica */}
+      {/* Overlay image */}
       <Image
         src={markerImageUrl}
         alt="Inquadra questa immagine"
@@ -95,7 +95,9 @@ export default function IceCorePage() {
       <div className={styles.uiContainer}>
         <div className={styles.textGroup}>
           {!isMarkerFound && (
-            <p className={styles.instructionText}>Frame the image to start</p>
+            <p className={styles.instructionText}>
+              Inquadra l`immagine per iniziare
+            </p>
           )}
 
           {isMarkerFound && !animationStarted && (
@@ -106,7 +108,7 @@ export default function IceCorePage() {
         {/* Go back button */}
         <div className={styles.bottomGroup}>
           <Link href="/" className={styles.backButton}>
-            ← Back to the scanner
+            ← Torna allo scanner
           </Link>
         </div>
       </div>
